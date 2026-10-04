@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DanielTran.Utility
+namespace Utility
 {
   public static class GameObjectExtensions
   {

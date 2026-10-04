@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace DanielTran.Utility.UI
+namespace Utility.UI
 {
   /// <summary>
   /// Handles fade animations for UI components by updating their alpha channels.

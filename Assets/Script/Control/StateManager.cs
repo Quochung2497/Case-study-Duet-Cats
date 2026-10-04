@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DanielTran.Control
+namespace Control
 {
   public class StateManager<TState> : IStateMachine<TState> where TState : Enum
   {

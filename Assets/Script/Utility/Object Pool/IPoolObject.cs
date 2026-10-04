@@ -1,6 +1,6 @@
 using UnityEngine.Pool;
 
-namespace DanielTran.Utility
+namespace Utility
 {
   public interface IPoolObject<T> where T : class
   {

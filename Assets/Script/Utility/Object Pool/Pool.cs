@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-namespace DanielTran.Utility
+namespace Utility
 {
   public abstract class Pool<T> : IPool<T>
     where T : MonoBehaviour, IPoolObject<T>

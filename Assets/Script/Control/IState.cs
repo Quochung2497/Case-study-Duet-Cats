@@ -1,6 +1,6 @@
 using System;
 
-namespace DanielTran.Control
+namespace Control
 {
   public interface IState<TState> where TState : Enum
   {

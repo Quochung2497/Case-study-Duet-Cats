@@ -1,6 +1,6 @@
 using System;
 
-namespace DanielTran.Control
+namespace Control
 {
   public abstract class State<TState> : IState<TState> where TState : Enum
   {
