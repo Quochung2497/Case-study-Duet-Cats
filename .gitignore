@@ -45,3 +45,10 @@ env
 .env
 .env.*
 /architecture.md
+
+/Assets/Spine/
+/Assets/Spine.meta
+/Assets/Spine Examples/
+/Assets/Spine Examples.meta
+/Assets/Editor/SpineSettings.asset
+/Assets/Editor/SpineSettings.asset.meta

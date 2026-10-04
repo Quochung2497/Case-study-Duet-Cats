@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Script/Inventory/ChestBehaviour.cs.meta
+guid: 74645fecb73113e4c9f6ba294af82a33
+========
+guid: d5d8a7888b51dda47b827ccf2c62fda0
+>>>>>>>> 69e38fd7 (feat: add chest spawner, chest opener, state machine behabviour):Assets/Script/Control/IStateMachine.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
