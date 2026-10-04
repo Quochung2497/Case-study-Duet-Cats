@@ -7,7 +7,7 @@ using UnityEngine.InputSystem.Controls;
 namespace Input
 {
     [CreateAssetMenu(fileName = "InputReader", menuName = "Duet Cats/Input Reader")]
-    public sealed class InputReader : ScriptableObject, IInputReader, PlayerControls.IGameplayActions
+    public class InputReader : ScriptableObject, IInputReader, PlayerControls.IGameplayActions
     {
         private const int MouseId = 0;
         private const double MouseTouchDelay = 0.2;
