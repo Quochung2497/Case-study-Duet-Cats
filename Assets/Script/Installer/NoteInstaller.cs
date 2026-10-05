@@ -8,14 +8,13 @@ namespace Game
 {
     public sealed class NoteInstaller : MonoBehaviour, IInstaller
     {
-        [SerializeField] private NoteBehaviour notePrefab;
-
+        [Inject] private NoteBehaviour _notePrefab;
         [Inject] private PlayableSettings _settings;
         [Inject] private ResponsiveLayout _layout;
 
         public void AwakeInitialize()
         {
-            if (notePrefab == null || _settings == null || _layout == null ||
+            if (_notePrefab == null || _settings == null || _layout == null ||
                 _settings.Chart == null || _settings.Song == null ||
                 _settings.TravelSeconds <= 0f || _settings.HitWindowSeconds < 0f)
             {
@@ -23,9 +22,9 @@ namespace Game
                 return;
             }
 
-            if (!notePrefab.TryGetComponent<Rigidbody2D>(out var rb) ||
+            if (!_notePrefab.TryGetComponent<Rigidbody2D>(out var rb) ||
                 rb.bodyType != RigidbodyType2D.Kinematic ||
-                !notePrefab.TryGetComponent<CircleCollider2D>(out var col) || !col.isTrigger)
+                !_notePrefab.TryGetComponent<CircleCollider2D>(out var col) || !col.isTrigger)
             {
                 Debug.LogError("Note prefab needs a Kinematic Rigidbody2D and trigger CircleCollider2D.", this);
                 return;
@@ -37,7 +36,7 @@ namespace Game
                 _layout.Refresh();
                 var manager = gameObject.GetOrAdd<NoteManager>();
                 var music = gameObject.GetOrAdd<AudioSource>();
-                manager.Initialize(chart, notePrefab, _settings, _layout, music);
+                manager.Initialize(chart, _notePrefab, _settings, _layout, music);
             }
             catch (FormatException ex)
             {

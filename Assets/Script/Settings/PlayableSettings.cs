@@ -84,6 +84,9 @@ namespace Game
         [Min(0.01f)] [SerializeField] private float travelSeconds = 1.4f;
         [Min(0f)] [SerializeField] private float hitWindowSeconds = 0.2f;
 
+        [Header("Game flow")]
+        [Min(0f)] [SerializeField] private float resultSeconds = 3f;
+
         [Header("Background")]
         [SerializeField] private Sprite portraitBackground;
         [SerializeField] private Sprite landscapeBackground;
@@ -123,6 +126,7 @@ namespace Game
         public AudioClip Song => song;
         public float TravelSeconds => travelSeconds;
         public float HitWindowSeconds => hitWindowSeconds;
+        public float ResultSeconds => resultSeconds;
         public float HitVfxTiltDegrees => hitVfxTiltDegrees;
         public float HitVfxSpreadDegrees => hitVfxSpreadDegrees;
         public float HitVfxAngleJitterDegrees => hitVfxAngleJitterDegrees;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Control.Note;
 using UnityEngine;
@@ -7,6 +8,7 @@ namespace Game
     public class NoteManager : MonoBehaviour
     {
         private readonly List<NoteBehaviour> _active = new();
+        private NoteEvent[] _chart;
         private NoteTimeline _timeline;
         private NotePool _pool;
         private PlayableSettings _settings;
@@ -15,23 +17,26 @@ namespace Game
         private double _songStartDsp;
         private bool _playing;
 
+        public event Action NoteMissed;
+        public event Action SongFinished;
+
         public void Initialize(NoteEvent[] chart, NoteBehaviour prefab,
             PlayableSettings settings, ResponsiveLayout layout, AudioSource music)
         {
-            _timeline = new NoteTimeline(chart, settings.TravelSeconds);
+            _chart = chart;
             _pool = new NotePool(prefab, transform);
             _settings = settings;
             _layout = layout;
             _music = music;
         }
 
-        private void Start() => StartSong();
-
-        private void StartSong()
+        public bool StartSong()
         {
-            if (_timeline == null) return;
+            if (_chart == null || _settings == null || _settings.Song == null || _music == null)
+                return false;
 
-            // TODO: Move song start and state ownership to GameManager after this note test.
+            StopSong();
+            _timeline = new NoteTimeline(_chart, _settings.TravelSeconds);
             _music.clip = _settings.Song;
             _music.playOnAwake = false;
             _music.loop = false;
@@ -39,6 +44,16 @@ namespace Game
             _songStartDsp = AudioSettings.dspTime + 0.1d;
             _music.PlayScheduled(_songStartDsp);
             _playing = true;
+            return true;
+        }
+
+        public void StopSong()
+        {
+            _playing = false;
+            if (_music != null) _music.Stop();
+            foreach (var note in _active)
+                if (note.HasNote) note.Release();
+            _active.Clear();
         }
 
         private void OnDestroy() => _pool?.GetPool().Clear();
@@ -78,14 +93,18 @@ namespace Game
                 if (songTime <= note.Note.SpawnTime + _timeline.TravelSeconds + _settings.HitWindowSeconds)
                     continue;
 
-                // Temporary miss cleanup until miss feedback is added.
                 note.Release();
                 _active.RemoveAt(i);
+                NoteMissed?.Invoke();
+                return;
             }
 
             if (_timeline.IsDone && _active.Count == 0 &&
                 songTime >= _music.clip.length)
+            {
                 _playing = false;
+                SongFinished?.Invoke();
+            }
         }
     }
 }

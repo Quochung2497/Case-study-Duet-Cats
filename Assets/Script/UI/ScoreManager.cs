@@ -13,12 +13,6 @@ namespace Game
         public int Score { get; private set; }
         public event Action ScoreChanged;
 
-        private void OnEnable()
-        {
-            // TODO: GameManager will reset the score when a new run begins.
-            ResetScore();
-        }
-
         public void AddPoints(NoteVisualType type)
         {
             if (_settings == null)

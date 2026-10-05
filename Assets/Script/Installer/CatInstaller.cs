@@ -9,17 +9,18 @@ namespace Game
 {
     public sealed class CatInstaller : MonoBehaviour, IInstaller
     {
-        [SerializeField] private CatBehaviour leftCat;
-        [SerializeField] private CatBehaviour rightCat;
-
         [Inject] private IInputReader _input;
         [Inject] private ResponsiveLayout _layout;
+        [Inject] private LayoutSceneRefs _sceneRefs;
 
         public void AwakeInitialize()
         {
-            if (leftCat == null || rightCat == null)
+            if (_sceneRefs == null || _sceneRefs.LeftCat == null ||
+                _sceneRefs.RightCat == null ||
+                !_sceneRefs.LeftCat.TryGetComponent(out CatBehaviour leftCat) ||
+                !_sceneRefs.RightCat.TryGetComponent(out CatBehaviour rightCat))
             {
-                Debug.LogError("Assign both cats on CatInstaller.", this);
+                Debug.LogError("PlayableInstaller needs both cat references.", this);
                 return;
             }
 
@@ -28,12 +29,7 @@ namespace Game
             Build(rightCat, left: false);
         }
 
-        public void StartInitialize()
-        {
-            // TODO: GameManager will signal Ready -> Playing when the song starts.
-            leftCat?.StartPlaying();
-            rightCat?.StartPlaying();
-        }
+        public void StartInitialize() { }
 
         private void Awake() => AwakeInitialize();
         private void Start() => StartInitialize();

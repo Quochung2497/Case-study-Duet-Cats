@@ -73,6 +73,12 @@ namespace Game
                 _fsm.TransitionToState(CatState.Playing);
         }
 
+        public void StopPlaying()
+        {
+            _playing = false;
+            StopDragInput();
+        }
+
         #endregion
 
         #region Animation
