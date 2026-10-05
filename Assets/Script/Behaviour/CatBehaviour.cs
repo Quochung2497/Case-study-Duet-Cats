@@ -1,30 +1,96 @@
+using System;
 using Control;
 using Control.Cat;
+using Control.Note;
 using Input;
+using Spine.Unity;
 using UnityEngine;
+using Utility;
 
 namespace Game
 {
-    public class CatBehaviour : MonoBehaviour
+    public class CatBehaviour : MonoBehaviour, ICatAnimation
     {
+        private static readonly CatClip[] IdleClips =
+        {
+            CatClip.IdleStart,
+            CatClip.IdlePlaying,
+            CatClip.IdleHungry,
+            CatClip.IdleLiemchan,
+            CatClip.IdleYawn
+        };
+
         private IInputReader _input;
         private ResponsiveLayout _layout;
         private ICatAction _action;
         private IStateMachine<CatState> _fsm;
+        private CatHitState _hitState;
+        private SkeletonAnimation _spine;
+        private int _animVersion;
+        private int _lastIdle = -1;
         private bool _left;
+        private bool _playing;
         private bool _subscribed;
 
         public bool IsLeft => _left;
 
-        public void Initialize(ICatAction action, IStateMachine<CatState> fsm, bool left,
-            IInputReader input, ResponsiveLayout layout)
+        public void Initialize(ICatAction action, IStateMachine<CatState> fsm, CatHitState hitState,
+            bool left, IInputReader input, ResponsiveLayout layout)
         {
             _action = action;
             _fsm = fsm;
+            _hitState = hitState;
             _left = left;
             _input = input;
             _layout = layout;
             if (isActiveAndEnabled) Subscribe();
+        }
+
+        public void SetupAnimation(SkeletonAnimation spine) => _spine = spine;
+
+        public void OnNoteHit(NoteVisualType type)
+        {
+            if (_fsm == null) return;
+
+            _hitState.OnHit(type);
+            if (_fsm.CurrentStateKey != CatState.Hit)
+                _fsm.TransitionToState(CatState.Hit);
+        }
+
+        public void StartPlaying()
+        {
+            _playing = true;
+            if (_fsm != null && !_action.IsDragging && _fsm.CurrentStateKey == CatState.Idle)
+                _fsm.TransitionToState(CatState.Playing);
+        }
+
+        public void PlayIdle(Action onComplete)
+        {
+            var index = UnityEngine.Random.Range(0, IdleClips.Length);
+            if (index == _lastIdle) index = (index + 1) % IdleClips.Length;
+            _lastIdle = index;
+            Play(IdleClips[index], false, onComplete);
+        }
+
+        public void PlayPlaying() => Play(CatClip.Listening, true);
+
+        public void PlayHit(NoteVisualType type, Action onComplete)
+        {
+            var clip = type == NoteVisualType.Normal
+                ? (UnityEngine.Random.value < 0.5f ? CatClip.EatingSingle1 : CatClip.EatingSingle2)
+                : CatClip.EatShot;
+            Play(clip, false, onComplete);
+        }
+
+        private void Play(CatClip clip, bool loop, Action onComplete = null)
+        {
+            var version = ++_animVersion;
+            var entry = AnimationPlayer.Play(_spine, clip, loop);
+            if (onComplete != null)
+                entry.Complete += _ =>
+                {
+                    if (version == _animVersion) onComplete();
+                };
         }
 
         private void OnEnable() => Subscribe();
@@ -37,7 +103,16 @@ namespace Game
             CancelDrag();
         }
 
-        private void Update() => _fsm?.Tick(Time.deltaTime);
+        private void Update() => UpdateCatState();
+
+        private void UpdateCatState()
+        {
+            if (_fsm == null) return;
+
+            _fsm.Tick(Time.deltaTime);
+            if (_fsm.CurrentStateKey == CatState.Hit && _hitState.IsComplete)
+                _fsm.TransitionToState(_playing && !_action.IsDragging ? CatState.Playing : CatState.Idle);
+        }
 
         private void Subscribe()
         {
@@ -59,7 +134,18 @@ namespace Game
             _subscribed = false;
         }
 
-        private void CancelDrag() => _action?.Cancel();
+        private void CancelDrag()
+        {
+            if (_action == null || !_action.IsDragging) return;
+            _action.Cancel();
+            ResumeListening();
+        }
+
+        private void ResumeListening()
+        {
+            if (_playing && _fsm != null && _fsm.CurrentStateKey == CatState.Idle)
+                _fsm.TransitionToState(CatState.Playing);
+        }
 
         private void OnPointerDown(PointerSample sam)
         {
@@ -67,8 +153,8 @@ namespace Game
             var centerX = (data.PlayLeft + data.PlayRight) * 0.5f;
             var pointerX = _layout.ScreenToWorldX(sam.ScreenX, sam.ScreenY);
             if (_action.TryBegin(sam.PointerId, pointerX, centerX) &&
-                _fsm.CurrentStateKey == CatState.Idle)
-                _fsm.TransitionToState(CatState.Tracking);
+                _playing && _fsm != null && _fsm.CurrentStateKey == CatState.Playing)
+                _fsm.TransitionToState(CatState.Idle);
         }
 
         private void OnPointerMoved(PointerSample sam)
@@ -84,6 +170,9 @@ namespace Game
             transform.position = new Vector3(nextX, pos.y, pos.z);
         }
 
-        private void OnPointerUp(PointerSample sam) => _action.TryEnd(sam.PointerId);
+        private void OnPointerUp(PointerSample sam)
+        {
+            if (_action.TryEnd(sam.PointerId)) ResumeListening();
+        }
     }
 }

@@ -1,6 +1,7 @@
 using Control;
 using Control.Cat;
 using Input;
+using Spine.Unity;
 using UnityEngine;
 using Utility.DependencyInjection;
 
@@ -27,7 +28,12 @@ namespace Game
             Build(rightCat, left: false);
         }
 
-        public void StartInitialize() { }
+        public void StartInitialize()
+        {
+            // TODO: GameManager will signal Ready -> Playing when the song starts.
+            leftCat?.StartPlaying();
+            rightCat?.StartPlaying();
+        }
 
         private void Awake() => AwakeInitialize();
         private void Start() => StartInitialize();
@@ -37,12 +43,21 @@ namespace Game
             if (!cat.TryGetComponent<Collider2D>(out _))
                 Debug.LogError($"{cat.name} needs a Collider2D for note hits.", cat);
 
+            if (!cat.TryGetComponent<SkeletonAnimation>(out var spine))
+            {
+                Debug.LogError($"{cat.name} needs SkeletonAnimation.", cat);
+                return;
+            }
+
+            cat.SetupAnimation(spine);
             ICatAction action = new CatAction(left);
+            var hitState = new CatHitState(cat);
             var fsm = new StateBuilder<CatState>()
-                .Add(new CatIdleState())
-                .Add(new CatTrackingState(action))
+                .Add(new CatIdleState(cat))
+                .Add(new CatPlayingState(cat))
+                .Add(hitState)
                 .Build(CatState.Idle);
-            cat.Initialize(action, fsm, left, _input, _layout);
+            cat.Initialize(action, fsm, hitState, left, _input, _layout);
         }
     }
 }

@@ -7,6 +7,8 @@ namespace Game
 {
     public class NoteBehaviour : MonoBehaviour, IPoolObject<NoteBehaviour>
     {
+        private int _catLayer;
+
         private IObjectPool<NoteBehaviour> _pool;
         private SpriteRenderer _sprite;
         private Rigidbody2D _rb;
@@ -18,7 +20,11 @@ namespace Game
         public NoteEvent Note { get; private set; }
         public bool HasNote => _hasNote;
 
-        private void Awake() => CacheComponents();
+        private void Awake()
+        {
+            _catLayer = LayerMask.NameToLayer("Cat");
+            CacheComponents();
+        }
 
         private void CacheComponents()
         {
@@ -73,10 +79,11 @@ namespace Game
 
         private void HandleTriggerEnter(Collider2D other)
         {
-            if (!_hasNote || !other.TryGetComponent<CatBehaviour>(out var cat) ||
+            if (!_hasNote || other.gameObject.layer != _catLayer ||
+                !other.TryGetComponent<CatBehaviour>(out var cat) ||
                 cat.IsLeft != (Note.Lane < 2)) return;
 
-            Debug.Log($"Hit note {Note.Id} ({Note.VisualType}, lane {Note.Lane}) with {cat.name}", this);
+            cat.OnNoteHit(Note.VisualType);
             Release();
         }
 

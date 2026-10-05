@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1777162012258221059}
   - component: {fileID: 3884465326754891078}
   - component: {fileID: 9100523103923904504}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: White Cat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,5 +179,5 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.060685575, y: 1.6277289}
-  m_Radius: 0.37270963
+  m_Offset: {x: 0, y: 1}
+  m_Radius: 0.48832223

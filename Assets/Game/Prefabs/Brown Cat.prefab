@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4546016466365787786}
   - component: {fileID: 2378990375480398148}
   - component: {fileID: 5640287680126525896}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Brown Cat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,5 +179,5 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.060685575, y: 1.6277289}
-  m_Radius: 0.37270963
+  m_Offset: {x: 0, y: 1}
+  m_Radius: 0.48832223
