@@ -34,3 +34,14 @@ MonoBehaviour:
     catY: 0.2
     hitY: 0.3
     spawnY: 1
+  chart: {fileID: 4900000, guid: 110dbcee4b9a41278c92efa4afdbf360, type: 3}
+  song: {fileID: 8300000, guid: 94bf464c2300ed649afe23e3edc6949f, type: 3}
+  travelSeconds: 1.2
+  hitWindowSeconds: 0.2
+  leftNormal: {fileID: -3923744130536475318, guid: 0a089d5af82c9774a91f4a6f37c3ad87, type: 3}
+  leftStrong: {fileID: -1769173556408961752, guid: 7c872459ee2c5664cb8ad23a93e1746a, type: 3}
+  leftLong: {fileID: 7976066172866923122, guid: d7a21beaf9449c242a7540f02eb6aac8, type: 3}
+  rightNormal: {fileID: -4347536902644777086, guid: 1186de20f9f7477428cafb2b32000d67, type: 3}
+  rightStrong: {fileID: 5698676842844662037, guid: ebc774ca2a077ee4e800fcdde1b78ff3, type: 3}
+  rightLong: {fileID: -8626142277367449852, guid: c285373c5e412224c9f0ee309acb56f2, type: 3}
+  lolipopLong: {fileID: -9067253411846048059, guid: 5308ea1581bd8b04c8afaf0549d370fb, type: 3}

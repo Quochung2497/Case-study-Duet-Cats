@@ -53,7 +53,8 @@ namespace Utility
 
     protected virtual void OnDestroyObject(T poolObject)
     {
-      GameObject.Destroy(poolObject.gameObject);
+      if (poolObject != null)
+        GameObject.Destroy(poolObject.gameObject);
     }
   }
 }

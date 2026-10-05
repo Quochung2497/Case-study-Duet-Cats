@@ -1,0 +1,82 @@
+using System.Collections.Generic;
+using Control.Note;
+using UnityEngine;
+
+namespace Game
+{
+    public class NoteManager : MonoBehaviour
+    {
+        private readonly List<NoteBehaviour> _active = new();
+        private NoteTimeline _timeline;
+        private NotePool _pool;
+        private PlayableSettings _settings;
+        private ResponsiveLayout _layout;
+        private AudioSource _music;
+        private double _songStartDsp;
+        private bool _playing;
+
+        public void Initialize(NoteEvent[] chart, NoteBehaviour prefab,
+            PlayableSettings settings, ResponsiveLayout layout, AudioSource music)
+        {
+            _timeline = new NoteTimeline(chart, settings.TravelSeconds);
+            _pool = new NotePool(prefab, transform);
+            _settings = settings;
+            _layout = layout;
+            _music = music;
+        }
+
+        private void Start()
+        {
+            if (_timeline == null) return;
+
+            // TODO: Move song start and state ownership to GameManager after this note test.
+            _music.clip = _settings.Song;
+            _music.playOnAwake = false;
+            _music.loop = false;
+            _music.spatialBlend = 0f;
+            _songStartDsp = AudioSettings.dspTime + 0.1d;
+            _music.PlayScheduled(_songStartDsp);
+            _playing = true;
+        }
+
+        private void OnDestroy() => _pool?.GetPool().Clear();
+
+        private void Update()
+        {
+            if (!_playing) return;
+
+            var songTime = AudioSettings.dspTime - _songStartDsp;
+            if (songTime < 0d) return;
+
+            while (_timeline.TryTakeDue(songTime, out var noteEvent))
+            {
+                var note = _pool.GetPool().Get();
+                note.SetNote(noteEvent, _settings.GetNoteSprite(noteEvent));
+                note.Place(songTime, _layout.Current, _timeline.TravelSeconds);
+                _active.Add(note);
+            }
+
+            for (var i = _active.Count - 1; i >= 0; i--)
+            {
+                var note = _active[i];
+                if (!note.HasNote)
+                {
+                    _active.RemoveAt(i);
+                    continue;
+                }
+
+                note.Place(songTime, _layout.Current, _timeline.TravelSeconds);
+                if (songTime <= note.Note.SpawnTime + _timeline.TravelSeconds + _settings.HitWindowSeconds)
+                    continue;
+
+                // Temporary miss cleanup; the hit judge will own this decision later.
+                note.Release();
+                _active.RemoveAt(i);
+            }
+
+            if (_timeline.IsDone && _active.Count == 0 &&
+                songTime >= _music.clip.length)
+                _playing = false;
+        }
+    }
+}
