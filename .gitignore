@@ -52,3 +52,6 @@ env
 /Assets/Spine Examples.meta
 /Assets/Editor/SpineSettings.asset
 /Assets/Editor/SpineSettings.asset.meta
+
+/Assets/TextMesh Pro/
+/Assets/TextMesh Pro.meta

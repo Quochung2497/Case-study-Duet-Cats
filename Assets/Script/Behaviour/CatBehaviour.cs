@@ -11,6 +11,8 @@ namespace Game
 {
     public class CatBehaviour : MonoBehaviour, ICatAnimation
     {
+        #region Fields and events
+
         private static readonly CatClip[] IdleClips =
         {
             CatClip.IdleStart,
@@ -34,6 +36,10 @@ namespace Game
 
         public bool IsLeft => _left;
         public event Action<NoteVisualType> NoteHit;
+
+        #endregion
+
+        #region Setup and gameplay
 
         public void Initialize(ICatAction action, IStateMachine<CatState> fsm, CatHitState hitState,
             bool left, IInputReader input, ResponsiveLayout layout)
@@ -67,6 +73,10 @@ namespace Game
                 _fsm.TransitionToState(CatState.Playing);
         }
 
+        #endregion
+
+        #region Animation
+
         public void PlayIdle(Action onComplete)
         {
             var index = UnityEngine.Random.Range(0, IdleClips.Length);
@@ -96,6 +106,10 @@ namespace Game
                 };
         }
 
+        #endregion
+
+        #region Lifecycle and state
+
         private void OnEnable() => Subscribe();
 
         private void OnDisable() => StopDragInput();
@@ -116,6 +130,10 @@ namespace Game
             if (_fsm.CurrentStateKey == CatState.Hit && _hitState.IsComplete)
                 _fsm.TransitionToState(_playing && !_action.IsDragging ? CatState.Playing : CatState.Idle);
         }
+
+        #endregion
+
+        #region Input
 
         private void Subscribe()
         {
@@ -177,5 +195,7 @@ namespace Game
         {
             if (_action.TryEnd(sam.PointerId)) ResumeListening();
         }
+
+        #endregion
     }
 }

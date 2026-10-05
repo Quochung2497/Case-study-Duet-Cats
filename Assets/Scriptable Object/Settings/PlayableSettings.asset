@@ -68,6 +68,17 @@ MonoBehaviour:
     size: 1.8
     speed: 2.5
     lifetime: 0.38
+  hitTextFont: {fileID: 11400000, guid: 47d9979143f05b4409f450328ff2f7d9, type: 2}
+  hitWords:
+  - Tasty!
+  - Sweet!
+  - Yummy!
+  hitTextColor: {r: 1, g: 1, b: 1, a: 1}
+  hitTextDuration: 0.7
+  hitTextOffsetY: 0.5
+  hitTextRise: 0.15
+  hitTextWorldWidth: 1.8
+  hitTextFontSize: 40
   portrait:
     sideMargin: 0.07
     maxPlayWidth: 4.6

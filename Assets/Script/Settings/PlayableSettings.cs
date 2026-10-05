@@ -7,6 +7,8 @@ namespace Game
     [CreateAssetMenu(fileName = "PlayableSettings", menuName = "Duet Cats/Playable Settings")]
     public class PlayableSettings : ScriptableObject
     {
+        #region Configuration types
+
         [Serializable]
         public struct LayoutProfile
         {
@@ -41,6 +43,10 @@ namespace Game
             [Min(0.01f)] public float lifetime;
         }
 
+        #endregion
+
+        #region Inspector fields
+
         [Header("Hit VFX")]
         [SerializeField] private Color leftHitColor = new Color(1f, 0.78f, 0.19f);
         [SerializeField] private Color rightHitColor = new Color(1f, 0.38f, 0.65f);
@@ -57,6 +63,16 @@ namespace Game
         [SerializeField] private HitVfxProfile strongHitVfx;
         [SerializeField] private HitVfxProfile longHitVfx;
         [SerializeField] private HitVfxProfile lolipopLongHitVfx;
+
+        [Header("Hit text")]
+        [SerializeField] private TMPro.TMP_FontAsset hitTextFont;
+        [SerializeField] private string[] hitWords = { "Tasty!", "Sweet!", "Yummy!" };
+        [SerializeField] private Color hitTextColor = Color.white;
+        [Min(0.01f)] [SerializeField] private float hitTextDuration = 0.7f;
+        [Min(0f)] [SerializeField] private float hitTextOffsetY = 0.45f;
+        [Min(0f)] [SerializeField] private float hitTextRise = 0.15f;
+        [Min(0.1f)] [SerializeField] private float hitTextWorldWidth = 1.8f;
+        [Min(1f)] [SerializeField] private float hitTextFontSize = 40f;
 
         [Header("Responsive layout")]
         [SerializeField] private LayoutProfile portrait;
@@ -87,6 +103,10 @@ namespace Game
         [SerializeField] private Sprite rightLong;
         [SerializeField] private Sprite lolipopLong;
 
+        #endregion
+
+        #region Public settings
+
         public LayoutProfile Portrait => portrait;
         public LayoutProfile Landscape => landscape;
         public TextAsset Chart => chart;
@@ -97,8 +117,20 @@ namespace Game
         public float HitVfxSpreadDegrees => hitVfxSpreadDegrees;
         public float HitVfxAngleJitterDegrees => hitVfxAngleJitterDegrees;
         public float HitVfxSpeedVariance => hitVfxSpeedVariance;
+        public TMPro.TMP_FontAsset HitTextFont => hitTextFont;
+        public string[] HitWords => hitWords;
+        public Color HitTextColor => hitTextColor;
+        public float HitTextDuration => hitTextDuration;
+        public float HitTextOffsetY => hitTextOffsetY;
+        public float HitTextRise => hitTextRise;
+        public float HitTextWorldWidth => hitTextWorldWidth;
+        public float HitTextFontSize => hitTextFontSize;
         public Sprite PortraitBackground => portraitBackground;
         public Sprite LandscapeBackground => landscapeBackground;
+
+        #endregion
+
+        #region Note presentation
 
         public HitVfxProfile GetHitVfx(NoteVisualType type)
         {
@@ -143,5 +175,7 @@ namespace Game
                 default: return left ? leftNormal : rightNormal;
             }
         }
+
+        #endregion
     }
 }
