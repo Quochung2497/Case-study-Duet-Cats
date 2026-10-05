@@ -43,6 +43,7 @@ Personal constraints left only 1–2 days to build this playable, so I prioritiz
 - **Game flow:** `GameManager` changes states directly. Applying the existing FSM framework to `Start`, `Playing`, `Result`, and `CTA` would isolate phase-specific transitions and timers.
 - **Coupling:** Some plain C# logic and UI still use concrete classes, such as `GameStateUI` reading `GameManager`. Small interfaces for state data and events would improve isolation.
 - **Notes:** All types use instant collision. Long notes could gain hold duration and begin/end handling.
+- **Chart data:** I used a custom JSON chart with only the fields this loop needs (`id`, `spawnTime`, `lane`, `visualType`). The original JSON's field meanings were unclear, and I could not seek clarification over the weekend. A later pass could map and validate the original data against the music.
 - **Variants:** One song/chart, a one-miss loss, and total score keep the run short. Chart variants, song start/end points, and session duration could enable A/B tests on the same game loop.
 - **CTA:** Song cards are visual only; a production build should open their destinations instead of reloading on tap.
 - **Landscape UI:** Gameplay adapts, but UI was tuned mainly for portrait. Landscape-specific `RectTransform` position, size, and rotation rules would improve it across screen ratios.
