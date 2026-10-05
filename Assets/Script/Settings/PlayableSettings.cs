@@ -42,6 +42,10 @@ namespace Game
         [Min(0.01f)] [SerializeField] private float travelSeconds = 1.4f;
         [Min(0f)] [SerializeField] private float hitWindowSeconds = 0.2f;
 
+        [Header("Background")]
+        [SerializeField] private Sprite portraitBackground;
+        [SerializeField] private Sprite landscapeBackground;
+
         [Header("Note sprites")]
         [SerializeField] private Sprite leftNormal;
         [SerializeField] private Sprite leftStrong;
@@ -57,6 +61,8 @@ namespace Game
         public AudioClip Song => song;
         public float TravelSeconds => travelSeconds;
         public float HitWindowSeconds => hitWindowSeconds;
+        public Sprite PortraitBackground => portraitBackground;
+        public Sprite LandscapeBackground => landscapeBackground;
 
         public Sprite GetNoteSprite(NoteEvent note)
         {
