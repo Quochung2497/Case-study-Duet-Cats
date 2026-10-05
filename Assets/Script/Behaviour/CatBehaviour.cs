@@ -33,6 +33,7 @@ namespace Game
         private bool _subscribed;
 
         public bool IsLeft => _left;
+        public event Action<NoteVisualType> NoteHit;
 
         public void Initialize(ICatAction action, IStateMachine<CatState> fsm, CatHitState hitState,
             bool left, IInputReader input, ResponsiveLayout layout)
@@ -55,6 +56,8 @@ namespace Game
             _hitState.OnHit(type);
             if (_fsm.CurrentStateKey != CatState.Hit)
                 _fsm.TransitionToState(CatState.Hit);
+
+            NoteHit?.Invoke(type);
         }
 
         public void StartPlaying()
