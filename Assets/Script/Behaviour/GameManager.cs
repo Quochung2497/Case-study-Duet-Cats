@@ -14,6 +14,12 @@ namespace Game
 
     public class GameManager : MonoBehaviour
     {
+#if UNITY_EDITOR
+        [Header("Debug")]
+        [Tooltip("Ignore all misses so the song can finish with a win in the Editor.")]
+        [SerializeField] private bool ignoreMisses;
+#endif
+
         private NoteManager _notes;
         private CatBehaviour _leftCat;
         private CatBehaviour _rightCat;
@@ -59,7 +65,13 @@ namespace Game
         }
 
         private void OnPointerDown(PointerSample _) => StartGame();
-        private void OnNoteMissed() => EndGame(false);
+        private void OnNoteMissed()
+        {
+#if UNITY_EDITOR
+            if (ignoreMisses) return;
+#endif
+            EndGame(false);
+        }
         private void OnSongFinished() => EndGame(true);
 
         public void StartGame()
@@ -81,8 +93,8 @@ namespace Game
             State = GameState.Result;
             _ctaAt = Time.unscaledTime + _settings.ResultSeconds;
             _notes.StopSong();
-            _leftCat.StopPlaying();
-            _rightCat.StopPlaying();
+            _leftCat.ShowResult(won);
+            _rightCat.ShowResult(won);
             StateChanged?.Invoke(State);
         }
 

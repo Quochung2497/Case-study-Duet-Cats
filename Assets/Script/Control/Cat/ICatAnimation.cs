@@ -8,5 +8,6 @@ namespace Control.Cat
         void PlayIdle(Action onComplete);
         void PlayPlaying();
         void PlayHit(NoteVisualType type, Action onComplete);
+        void PlayResult(bool won);
     }
 }

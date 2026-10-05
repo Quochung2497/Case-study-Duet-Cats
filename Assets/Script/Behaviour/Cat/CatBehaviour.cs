@@ -27,6 +27,7 @@ namespace Game
         private ICatAction _action;
         private IStateMachine<CatState> _fsm;
         private CatHitState _hitState;
+        private CatResultState _resultState;
         private SkeletonAnimation _spine;
         private int _animVersion;
         private int _lastIdle = -1;
@@ -42,11 +43,12 @@ namespace Game
         #region Setup and gameplay
 
         public void Initialize(ICatAction action, IStateMachine<CatState> fsm, CatHitState hitState,
-            bool left, IInputReader input, ResponsiveLayout layout)
+            CatResultState resultState, bool left, IInputReader input, ResponsiveLayout layout)
         {
             _action = action;
             _fsm = fsm;
             _hitState = hitState;
+            _resultState = resultState;
             _left = left;
             _input = input;
             _layout = layout;
@@ -57,7 +59,7 @@ namespace Game
 
         public void OnNoteHit(NoteVisualType type)
         {
-            if (_fsm == null) return;
+            if (_fsm == null || _fsm.CurrentStateKey == CatState.Result) return;
 
             _hitState.OnHit(type);
             if (_fsm.CurrentStateKey != CatState.Hit)
@@ -79,6 +81,15 @@ namespace Game
             StopDragInput();
         }
 
+        public void ShowResult(bool won)
+        {
+            StopPlaying();
+            if (_fsm == null) return;
+
+            _resultState.SetOutcome(won);
+            _fsm.TransitionToState(CatState.Result);
+        }
+
         #endregion
 
         #region Animation
@@ -92,6 +103,9 @@ namespace Game
         }
 
         public void PlayPlaying() => Play(CatClip.Listening, true);
+
+        public void PlayResult(bool won) =>
+            Play(won ? CatClip.Victory : CatClip.MissObjectLose2, true);
 
         public void PlayHit(NoteVisualType type, Action onComplete)
         {

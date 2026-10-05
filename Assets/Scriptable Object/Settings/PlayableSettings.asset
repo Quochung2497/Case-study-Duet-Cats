@@ -105,7 +105,7 @@ MonoBehaviour:
   song: {fileID: 8300000, guid: 94bf464c2300ed649afe23e3edc6949f, type: 3}
   travelSeconds: 1.2
   hitWindowSeconds: 0.2
-  resultSeconds: 2
+  resultSeconds: 3
   portraitBackground: {fileID: -4500712686193554759, guid: 9c3de7bc6677f1346aa3b1fd158b63da, type: 3}
   landscapeBackground: {fileID: -7536193595675217356, guid: 4bf0465b9e7bf9c4fb5d34a35d60c5df, type: 3}
   normalNoteRadius: 0.34

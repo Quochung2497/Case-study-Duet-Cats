@@ -48,12 +48,14 @@ namespace Game
             cat.SetupAnimation(spine);
             ICatAction action = new CatAction(left);
             var hitState = new CatHitState(cat);
+            var resultState = new CatResultState(cat);
             var fsm = new StateBuilder<CatState>()
                 .Add(new CatIdleState(cat))
                 .Add(new CatPlayingState(cat))
                 .Add(hitState)
+                .Add(resultState)
                 .Build(CatState.Idle);
-            cat.Initialize(action, fsm, hitState, left, _input, _layout);
+            cat.Initialize(action, fsm, hitState, resultState, left, _input, _layout);
         }
     }
 }

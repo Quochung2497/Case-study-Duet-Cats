@@ -4,6 +4,7 @@ namespace Control.Cat
     {
         Idle,
         Playing,
-        Hit
+        Hit,
+        Result
     }
 }
