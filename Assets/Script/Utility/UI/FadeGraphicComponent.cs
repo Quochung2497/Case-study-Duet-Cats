@@ -75,7 +75,9 @@ namespace Utility.UI
     /// <summary>
     /// Initializes the alpha values for all alpha objects.
     /// </summary>
-    private void Awake()
+    private void Awake() => InitializeAlphaObjects();
+
+    private void InitializeAlphaObjects()
     {
       for (int i = 0; i < alphaObjects.Length; i++)
       {

@@ -39,7 +39,11 @@ namespace Utility.DependencyInjection
     protected override void Awake()
     {
       base.Awake();
+      InitializeDependencies();
+    }
 
+    private void InitializeDependencies()
+    {
       // Find all classes that implement IDependencyProvider
       var providers = FindMonoBehaviours().OfType<IDependencyProvider>();
       foreach (var provider in providers)

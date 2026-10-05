@@ -34,6 +34,9 @@ namespace Game
 
         private void Build(CatBehaviour cat, bool left)
         {
+            if (!cat.TryGetComponent<Collider2D>(out _))
+                Debug.LogError($"{cat.name} needs a Collider2D for note hits.", cat);
+
             ICatAction action = new CatAction(left);
             var fsm = new StateBuilder<CatState>()
                 .Add(new CatIdleState())

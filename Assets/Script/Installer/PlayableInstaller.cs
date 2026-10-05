@@ -40,7 +40,9 @@ namespace Game
 
         private void Awake() => AwakeInitialize();
         private void Start() => StartInitialize();
-        private void OnDestroy()
+        private void OnDestroy() => ShutdownInput();
+
+        private void ShutdownInput()
         {
             if (inputReader != null)
                 inputReader.Shutdown();

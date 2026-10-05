@@ -162,7 +162,9 @@ namespace Game
             cat.position = new Vector3(x, y, pos.z);
         }
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmos() => DrawLayoutGizmos();
+
+        private void DrawLayoutGizmos()
         {
             var settings = GetSettings();
             var refs = GetRefs();

@@ -46,6 +46,12 @@ namespace Game
         [SerializeField] private Sprite portraitBackground;
         [SerializeField] private Sprite landscapeBackground;
 
+        [Header("Note collider radii")]
+        [Range(0.34f, 0.49f)] [SerializeField] private float normalNoteRadius = 0.34f;
+        [Range(0.34f, 0.49f)] [SerializeField] private float strongNoteRadius = 0.49f;
+        [Range(0.34f, 0.49f)] [SerializeField] private float longNoteRadius = 0.42f;
+        [Range(0.34f, 0.49f)] [SerializeField] private float lolipopLongNoteRadius = 0.49f;
+
         [Header("Note sprites")]
         [SerializeField] private Sprite leftNormal;
         [SerializeField] private Sprite leftStrong;
@@ -63,6 +69,17 @@ namespace Game
         public float HitWindowSeconds => hitWindowSeconds;
         public Sprite PortraitBackground => portraitBackground;
         public Sprite LandscapeBackground => landscapeBackground;
+
+        public float GetNoteRadius(NoteVisualType type)
+        {
+            switch (type)
+            {
+                case NoteVisualType.Strong: return strongNoteRadius;
+                case NoteVisualType.Long: return longNoteRadius;
+                case NoteVisualType.LolipopLong: return lolipopLongNoteRadius;
+                default: return normalNoteRadius;
+            }
+        }
 
         public Sprite GetNoteSprite(NoteEvent note)
         {

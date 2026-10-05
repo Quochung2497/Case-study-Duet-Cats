@@ -25,7 +25,9 @@ namespace Game
             _music = music;
         }
 
-        private void Start()
+        private void Start() => StartSong();
+
+        private void StartSong()
         {
             if (_timeline == null) return;
 
@@ -41,17 +43,24 @@ namespace Game
 
         private void OnDestroy() => _pool?.GetPool().Clear();
 
-        private void Update()
+        private void FixedUpdate() => UpdateNotes();
+
+        private void UpdateNotes()
         {
             if (!_playing) return;
 
             var songTime = AudioSettings.dspTime - _songStartDsp;
             if (songTime < 0d) return;
 
+            // A trigger can release a note after FixedUpdate. Remove it before the pool reuses it.
+            for (var i = _active.Count - 1; i >= 0; i--)
+                if (!_active[i].HasNote) _active.RemoveAt(i);
+
             while (_timeline.TryTakeDue(songTime, out var noteEvent))
             {
                 var note = _pool.GetPool().Get();
-                note.SetNote(noteEvent, _settings.GetNoteSprite(noteEvent));
+                note.SetNote(noteEvent, _settings.GetNoteSprite(noteEvent),
+                    _settings.GetNoteRadius(noteEvent.VisualType));
                 note.Place(songTime, _layout.Current, _timeline.TravelSeconds);
                 _active.Add(note);
             }
@@ -69,7 +78,7 @@ namespace Game
                 if (songTime <= note.Note.SpawnTime + _timeline.TravelSeconds + _settings.HitWindowSeconds)
                     continue;
 
-                // Temporary miss cleanup; the hit judge will own this decision later.
+                // Temporary miss cleanup until miss feedback is added.
                 note.Release();
                 _active.RemoveAt(i);
             }

@@ -14,6 +14,8 @@ namespace Game
         private bool _left;
         private bool _subscribed;
 
+        public bool IsLeft => _left;
+
         public void Initialize(ICatAction action, IStateMachine<CatState> fsm, bool left,
             IInputReader input, ResponsiveLayout layout)
         {
@@ -27,7 +29,9 @@ namespace Game
 
         private void OnEnable() => Subscribe();
 
-        private void OnDisable()
+        private void OnDisable() => StopDragInput();
+
+        private void StopDragInput()
         {
             Unsubscribe();
             CancelDrag();

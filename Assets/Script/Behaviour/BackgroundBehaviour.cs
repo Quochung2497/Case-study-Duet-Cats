@@ -15,13 +15,17 @@ namespace Game
         private float _orthoSize = -1f;
         private Vector3 _cameraPos;
 
-        private void Awake()
+        private void Awake() => SetupRenderer();
+
+        private void SetupRenderer()
         {
             _renderer = gameObject.GetOrAdd<SpriteRenderer>();
             _renderer.sortingOrder = -100;
         }
 
-        private void LateUpdate()
+        private void LateUpdate() => RefreshBackground();
+
+        private void RefreshBackground()
         {
             var cam = _refs?.Camera;
             if (_settings == null || cam == null || !cam.orthographic)

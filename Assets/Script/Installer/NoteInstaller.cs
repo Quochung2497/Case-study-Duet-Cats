@@ -23,6 +23,14 @@ namespace Game
                 return;
             }
 
+            if (!notePrefab.TryGetComponent<Rigidbody2D>(out var rb) ||
+                rb.bodyType != RigidbodyType2D.Kinematic ||
+                !notePrefab.TryGetComponent<CircleCollider2D>(out var col) || !col.isTrigger)
+            {
+                Debug.LogError("Note prefab needs a Kinematic Rigidbody2D and trigger CircleCollider2D.", this);
+                return;
+            }
+
             try
             {
                 var chart = NoteChart.Parse(_settings.Chart.text);
