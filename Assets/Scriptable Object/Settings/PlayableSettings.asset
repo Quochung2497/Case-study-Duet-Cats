@@ -118,3 +118,7 @@ MonoBehaviour:
   rightStrong: {fileID: 5698676842844662037, guid: ebc774ca2a077ee4e800fcdde1b78ff3, type: 3}
   rightLong: {fileID: -8626142277367449852, guid: c285373c5e412224c9f0ee309acb56f2, type: 3}
   lolipopLong: {fileID: -9067253411846048059, guid: 5308ea1581bd8b04c8afaf0549d370fb, type: 3}
+  normalPoints: 2
+  strongPoints: 5
+  longPoints: 10
+  lolipopLongPoints: 10

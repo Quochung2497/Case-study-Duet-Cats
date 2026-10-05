@@ -8,6 +8,7 @@ namespace Game
     public class NoteBehaviour : MonoBehaviour, IPoolObject<NoteBehaviour>
     {
         private int _catLayer;
+        private ScoreManager _score;
 
         private IObjectPool<NoteBehaviour> _pool;
         private SpriteRenderer _sprite;
@@ -28,6 +29,7 @@ namespace Game
 
         private void CacheComponents()
         {
+            _score = ScoreManager.Instance;
             _sprite = gameObject.GetOrAdd<SpriteRenderer>();
             _defaultSprite = _sprite.sprite;
             TryGetComponent(out _rb);
@@ -83,7 +85,9 @@ namespace Game
                 !other.TryGetComponent<CatBehaviour>(out var cat) ||
                 cat.IsLeft != (Note.Lane < 2)) return;
 
-            cat.OnNoteHit(Note.VisualType);
+            var type = Note.VisualType;
+            cat.OnNoteHit(type);
+            _score.AddPoints(type);
             Release();
         }
 

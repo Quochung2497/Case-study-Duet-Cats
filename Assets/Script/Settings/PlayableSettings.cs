@@ -105,6 +105,16 @@ namespace Game
 
         #endregion
 
+        #region Score values
+
+        [Header("Score")]
+        [Min(0)] [SerializeField] private int normalPoints = 2;
+        [Min(0)] [SerializeField] private int strongPoints = 5;
+        [Min(0)] [SerializeField] private int longPoints = 10;
+        [Min(0)] [SerializeField] private int lolipopLongPoints = 10;
+
+        #endregion
+
         #region Public settings
 
         public LayoutProfile Portrait => portrait;
@@ -173,6 +183,21 @@ namespace Game
                 case NoteVisualType.Strong: return left ? leftStrong : rightStrong;
                 case NoteVisualType.Long: return left ? leftLong : rightLong;
                 default: return left ? leftNormal : rightNormal;
+            }
+        }
+
+        #endregion
+
+        #region Score
+
+        public int GetPoints(NoteVisualType type)
+        {
+            switch (type)
+            {
+                case NoteVisualType.Strong: return strongPoints;
+                case NoteVisualType.Long: return longPoints;
+                case NoteVisualType.LolipopLong: return lolipopLongPoints;
+                default: return normalPoints;
             }
         }
 
