@@ -15,6 +15,7 @@ namespace Game
 
         public void AwakeInitialize()
         {
+            // Build the cat FSMs only after both cat objects have the required components.
             if (_sceneRefs == null || _sceneRefs.LeftCat == null ||
                 _sceneRefs.RightCat == null ||
                 !_sceneRefs.LeftCat.TryGetComponent(out CatBehaviour leftCat) ||
@@ -36,6 +37,7 @@ namespace Game
 
         private void Build(CatBehaviour cat, bool left)
         {
+            // The collider receives note triggers; SkeletonAnimation plays Spine clips.
             if (!cat.TryGetComponent<Collider2D>(out _))
                 Debug.LogError($"{cat.name} needs a Collider2D for note hits.", cat);
 
@@ -46,6 +48,7 @@ namespace Game
             }
 
             cat.SetupAnimation(spine);
+            // Give each cat its own action, states, and FSM so their drag and hit flows stay separate.
             ICatAction action = new CatAction(left);
             var hitState = new CatHitState(cat);
             var resultState = new CatResultState(cat);

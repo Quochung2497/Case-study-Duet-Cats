@@ -4,6 +4,7 @@ namespace Control
 {
   public abstract class State<TState> : IState<TState> where TState : Enum
   {
+    // Attach the state machine once after StateManager registers this state.
     public TState StateKey { get; }
     protected IStateMachine<TState> StateMachine { get; private set; }
 
@@ -14,6 +15,7 @@ namespace Control
 
     public void SetStateMachine(IStateMachine<TState> stateMachine)
     {
+      // Prevent one state object from being reused by two machines.
       if (stateMachine == null)
         throw new ArgumentNullException(nameof(stateMachine));
       if (StateMachine != null)

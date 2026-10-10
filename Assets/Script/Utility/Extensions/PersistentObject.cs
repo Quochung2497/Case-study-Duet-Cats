@@ -9,6 +9,7 @@ namespace Utility
   {
     private void Awake()
     {
+      // Keep this GameObject across scene loads; the current playable does not use it.
       DontDestroyOnLoad(gameObject);
     }
   }

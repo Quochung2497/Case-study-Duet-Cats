@@ -16,6 +16,7 @@ namespace Game
 
     public class GameManager : MonoBehaviour
     {
+        // This state tracks the whole run, separate from each cat's animation FSM.
 #if UNITY_EDITOR
         [Header("Debug")]
         [Tooltip("Ignore all misses so the song can finish with a win in the Editor.")]
@@ -41,6 +42,7 @@ namespace Game
         public void Initialize(NoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
             IInputReader input, PlayableSettings settings)
         {
+            // The installer supplies dependencies; this manager listens for input and note outcomes.
             _notes = notes;
             _leftCat = leftCat;
             _rightCat = rightCat;
@@ -62,12 +64,14 @@ namespace Game
 
         private void UpdateStart()
         {
+            // The first tap sets a deadline; Playing begins after the transition.
             if (!_starting || Time.unscaledTime < _startAt) return;
             BeginPlaying();
         }
 
         private void UpdateResult()
         {
+            // Keep Result visible for its configured delay before moving to CTA.
             if (State == GameState.Result && Time.unscaledTime >= _ctaAt)
                 ShowCta();
         }
@@ -82,6 +86,7 @@ namespace Game
 
         private void OnPointerDown(PointerSample _)
         {
+            // The same pointer event starts a run in Start and schedules a reload in CTA.
             if (State == GameState.Start)
                 StartGame();
             else if (State == GameState.Cta && !_reloading)
@@ -99,6 +104,7 @@ namespace Game
 
         private void OnNoteMissed()
         {
+            // The Editor-only debug flag ignores misses so the whole song can play.
 #if UNITY_EDITOR
             if (ignoreMisses) return;
 #endif
@@ -108,6 +114,7 @@ namespace Game
 
         public void StartGame()
         {
+            // _starting prevents repeated taps from starting multiple transitions.
             if (State != GameState.Start || _starting) return;
             _starting = true;
             _startAt = Time.unscaledTime + _settings.StartTransitionSeconds;
@@ -117,6 +124,7 @@ namespace Game
         private void BeginPlaying()
         {
             _starting = false;
+            // Change state and reset score only after the song is scheduled successfully.
             if (!_notes.StartSong())
             {
                 StateChanged?.Invoke(State);
@@ -132,6 +140,7 @@ namespace Game
 
         private void EndGame(bool won)
         {
+            // A run has one result; later misses or song completion are ignored.
             if (State != GameState.Playing) return;
 
             Won = won;
@@ -145,6 +154,7 @@ namespace Game
 
         public void ShowCta()
         {
+            // Hide both cats before notifying the UI that CTA has begun.
             if (State != GameState.Result) return;
 
             State = GameState.Cta;

@@ -15,6 +15,7 @@ namespace Utility
     {
       Prefab = prefab;
 
+      // Unity ObjectPool invokes these callbacks on create, get, release, and destroy.
       PoolInstance = new ObjectPool<T>(
         OnCreate,
         OnGet,
@@ -42,6 +43,7 @@ namespace Utility
 
     protected virtual void OnGet(T poolObject)
     {
+      // Reset before activation so OnEnable sees clean data.
       poolObject.ResetForReuse();
       poolObject.gameObject.SetActive(true);
     }

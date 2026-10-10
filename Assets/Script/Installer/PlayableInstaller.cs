@@ -7,6 +7,7 @@ namespace Game
 {
     public sealed class PlayableInstaller : MonoBehaviour, IInstaller, IDependencyProvider
     {
+        // Keep Inspector references in one place instead of duplicating them in each installer.
         [Header("Scriptable Objects")]
         [SerializeField] private PlayableSettings settings;
         [SerializeField] private InputReader inputReader;
@@ -24,6 +25,7 @@ namespace Game
         public PlayableSettings Settings => settings;
         public LayoutSceneRefs SceneRefs => new(gameplayCamera, leftCat, rightCat);
 
+        // Injector scans [Provide] methods and registers each object by its return type.
         [Provide] public PlayableSettings ProvideSettings() => settings;
         [Provide] public LayoutSceneRefs ProvideSceneRefs() => SceneRefs;
         [Provide] public IInputReader ProvideInputReader() => inputReader;
@@ -34,6 +36,7 @@ namespace Game
 
         public void AwakeInitialize()
         {
+            // Stop setup early if required scene references are missing.
             if (settings == null || inputReader == null || notePrefab == null ||
                 gameplayCamera == null ||
                 leftCat == null || rightCat == null || responsiveLayout == null ||
@@ -43,6 +46,7 @@ namespace Game
                 return;
             }
 
+            // Enable input only after validating scene references.
             inputReader.Initialize();
         }
 
@@ -54,6 +58,7 @@ namespace Game
 
         private void ShutdownInput()
         {
+            // Remove Input System callbacks when the scene is destroyed or reloaded.
             if (inputReader != null)
                 inputReader.Shutdown();
         }

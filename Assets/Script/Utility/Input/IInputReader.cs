@@ -3,6 +3,7 @@ using System;
 namespace Input
 {
     /// <summary>One pointer position in screen pixels. Mouse uses id 0; touches use positive ids.</summary>
+    // The ID lets each cat follow the same finger that began its drag.
     public readonly struct PointerSample
     {
         public int PointerId { get; }
@@ -18,6 +19,7 @@ namespace Input
     }
 
     /// <summary>Input events consumed by scene presenters without depending on Unity's Input System.</summary>
+    // Consumers receive pointer events without knowing Input System callbacks.
     public interface IInputReader
     {
         event Action<PointerSample> PointerDown;

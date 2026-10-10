@@ -32,12 +32,14 @@ namespace Utility
     {
         public static TrackEntry Play(SkeletonAnimation cat, CatClip clip, bool loop = false)
         {
+            // Spine track 0 is the main track; SetAnimation replaces its current clip immediately.
             if (cat == null) throw new ArgumentNullException(nameof(cat));
             return cat.AnimationState.SetAnimation(0, Name(clip), loop);
         }
 
         public static string Name(CatClip clip)
         {
+            // Only this file knows Spine clip names; callers use the CatClip enum.
             switch (clip)
             {
                 case CatClip.IdleStart: return "Idle_Start";

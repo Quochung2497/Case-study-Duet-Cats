@@ -21,6 +21,7 @@ namespace Game
 
         private void OnEnable()
         {
+            // On enable, display the current score before waiting for later changes.
             _score = ScoreManager.Instance;
             _score.ScoreChanged += Refresh;
             _game.StateChanged += OnGameStateChanged;
@@ -36,6 +37,7 @@ namespace Game
 
         private void OnGameStateChanged(GameState state)
         {
+            // Set the status Animator's Lose flag only for a losing Result.
             if (state == GameState.Result && !_game.Won && _statusAnimator != null)
                 _statusAnimator.SetBool("Lose", true);
         }

@@ -31,6 +31,7 @@ namespace Game
             if (_settings == null || cam == null || !cam.orthographic)
                 return;
 
+            // Choose the background sprite for the current screen orientation.
             var sprite = cam.aspect < 1f
                 ? _settings.PortraitBackground
                 : _settings.LandscapeBackground;
@@ -38,6 +39,7 @@ namespace Game
                 return;
 
             var camPos = cam.transform.position;
+            // Recalculate scale only when the sprite or camera changes.
             if (sprite == _sprite && Mathf.Approximately(cam.aspect, _aspect) &&
                 Mathf.Approximately(cam.orthographicSize, _orthoSize) &&
                 camPos == _cameraPos)
@@ -49,6 +51,7 @@ namespace Game
             var camHeight = cam.orthographicSize * 2f;
             var camWidth = camHeight * cam.aspect;
             var size = sprite.bounds.size;
+            // Use the larger scale factor to cover the camera in both dimensions.
             var scale = Mathf.Max(camWidth / size.x, camHeight / size.y);
 
             var pos = transform.position;

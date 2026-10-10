@@ -2,6 +2,7 @@ namespace Control.Cat
 {
     public class CatAction : ICatAction
     {
+        // Each instance controls one cat and accepts one pointer ID at a time.
         private readonly bool _left;
         private int _pointerId;
         private float _lastX;
@@ -15,6 +16,7 @@ namespace Control.Cat
 
         public bool TryBegin(int pointerId, float pointerX, float centerX)
         {
+            // Begin only on this cat's half of the screen and while not already dragging.
             if (IsDragging || (_left ? pointerX >= centerX : pointerX < centerX))
                 return false;
 
@@ -31,6 +33,7 @@ namespace Control.Cat
             if (!IsDragging || pointerId != _pointerId)
                 return false;
 
+            // Move by pointer delta instead of teleporting the cat to the touch position.
             var delta = pointerX - _lastX;
             _lastX = pointerX;
             nextX = Clamp(currentX + delta, minX, maxX);
@@ -39,6 +42,7 @@ namespace Control.Cat
 
         public bool TryEnd(int pointerId)
         {
+            // A different pointer cannot end this drag.
             if (!IsDragging || pointerId != _pointerId)
                 return false;
 

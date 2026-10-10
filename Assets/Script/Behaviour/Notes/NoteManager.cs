@@ -23,6 +23,7 @@ namespace Game
         public void Initialize(NoteEvent[] chart, NoteBehaviour prefab,
             PlayableSettings settings, ResponsiveLayout layout, AudioSource music)
         {
+            // The installer provides dependencies once; the pool creates notes when needed.
             _chart = chart;
             _pool = new NotePool(prefab, transform);
             _settings = settings;
@@ -36,12 +37,14 @@ namespace Game
                 return false;
 
             StopSong();
+            // Create a fresh timeline for each run so its note cursor starts at zero.
             _timeline = new NoteTimeline(_chart, _settings.TravelSeconds);
             _music.clip = _settings.Song;
             _music.playOnAwake = false;
             _music.loop = false;
             _music.spatialBlend = 0f;
             _songStartDsp = AudioSettings.dspTime + 0.1d;
+            // Use the DSP clock for both audio and note positions to avoid frame-rate drift.
             _music.PlayScheduled(_songStartDsp);
             _playing = true;
             return true;
@@ -49,6 +52,7 @@ namespace Game
 
         public void StopSong()
         {
+            // Return all active notes to the pool when the run ends.
             _playing = false;
             if (_music != null) _music.Stop();
             foreach (var note in _active)
@@ -67,10 +71,11 @@ namespace Game
             var songTime = AudioSettings.dspTime - _songStartDsp;
             if (songTime < 0d) return;
 
-            // A trigger can release a note after FixedUpdate. Remove it before the pool reuses it.
+            // A trigger may release a note after FixedUpdate; drop stale references before pool reuse.
             for (var i = _active.Count - 1; i >= 0; i--)
                 if (!_active[i].HasNote) _active.RemoveAt(i);
 
+            // Take every note due to spawn, including several in the same tick.
             while (_timeline.TryTakeDue(songTime, out var noteEvent))
             {
                 var note = _pool.GetPool().Get();
@@ -80,6 +85,7 @@ namespace Game
                 _active.Add(note);
             }
 
+            // Iterate backward so hit or missed notes can be removed in place.
             for (var i = _active.Count - 1; i >= 0; i--)
             {
                 var note = _active[i];
@@ -90,6 +96,7 @@ namespace Game
                 }
 
                 note.Place(songTime, _layout.Current, _timeline.TravelSeconds);
+                // Count a miss when the note passes arrival time plus the hit window.
                 if (songTime <= note.Note.SpawnTime + _timeline.TravelSeconds + _settings.HitWindowSeconds)
                     continue;
 
@@ -99,6 +106,7 @@ namespace Game
                 return;
             }
 
+            // Finish only after the chart, active notes, and audio clip have all ended.
             if (_timeline.IsDone && _active.Count == 0 &&
                 songTime >= _music.clip.length)
             {

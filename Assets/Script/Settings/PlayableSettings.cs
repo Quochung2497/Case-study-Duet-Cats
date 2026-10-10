@@ -7,6 +7,7 @@ namespace Game
     [CreateAssetMenu(fileName = "PlayableSettings", menuName = "Duet Cats/Playable Settings")]
     public class PlayableSettings : ScriptableObject
     {
+        // One Inspector asset supplies configuration to all playable systems.
         #region Configuration types
 
         [Serializable]
@@ -152,6 +153,7 @@ namespace Game
 
         public HitVfxProfile GetHitVfx(NoteVisualType type)
         {
+            // Select a particle profile per visual type, with Normal as the fallback.
             switch (type)
             {
                 case NoteVisualType.Strong: return strongHitVfx;
@@ -163,6 +165,7 @@ namespace Game
 
         public Color GetHitVfxColor(NoteVisualType type, bool left, float t)
         {
+            // Lolipop uses a gradient across particles; other types use the cat's color.
             if (type == NoteVisualType.LolipopLong && lolipopLongHitGradient != null)
                 return lolipopLongHitGradient.Evaluate(t);
 
@@ -171,6 +174,7 @@ namespace Game
 
         public float GetNoteRadius(NoteVisualType type)
         {
+            // Match the note collider radius to its visual type.
             switch (type)
             {
                 case NoteVisualType.Strong: return strongNoteRadius;
@@ -182,6 +186,7 @@ namespace Game
 
         public Sprite GetNoteSprite(NoteEvent note)
         {
+            // Lolipop shares one sprite; other notes choose left or right from the lane.
             if (note.VisualType == NoteVisualType.LolipopLong)
                 return lolipopLong;
 
@@ -200,6 +205,7 @@ namespace Game
 
         public int GetPoints(NoteVisualType type)
         {
+            // ScoreManager needs only the visual type, not the entire NoteEvent.
             switch (type)
             {
                 case NoteVisualType.Strong: return strongPoints;
