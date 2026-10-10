@@ -14,6 +14,7 @@ namespace Game
 
         public void AwakeInitialize()
         {
+            // Find CatBehaviour on each scene transform and wire both into GameManager.
             if (_notes == null || _manager == null || _sceneRefs == null ||
                 _input == null || _settings == null ||
                 _sceneRefs.LeftCat == null || _sceneRefs.RightCat == null ||

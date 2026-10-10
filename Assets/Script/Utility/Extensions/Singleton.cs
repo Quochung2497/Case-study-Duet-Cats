@@ -20,6 +20,7 @@ namespace Utility
     {
       get
       {
+        // Prefer an instance in the scene; create a GameObject only if none exists.
         if (instance)
           return instance;
         instance = FindFirstObjectByType<T>();
@@ -36,6 +37,7 @@ namespace Utility
 
     protected virtual void InitializeSingleton()
     {
+      // Do not register a static instance in Edit mode.
       if (!Application.isPlaying)
       {
         return;

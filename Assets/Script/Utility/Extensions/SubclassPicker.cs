@@ -11,6 +11,7 @@ using UnityEngine.TestTools;
 
 [ExcludeFromCoverage]
 [ExcludeFromCodeCoverage]
+// Mark a field so the Inspector can choose a managed-reference subclass.
 public class SubclassPicker : PropertyAttribute { }
 
 #if UNITY_EDITOR
@@ -26,6 +27,7 @@ public class SubclassPickerDrawer : PropertyDrawer
 
   IEnumerable GetClasses(Type baseType)
   {
+    // List concrete subclasses of the base type in the same assembly.
     return Assembly
       .GetAssembly(baseType)
       .GetTypes()
@@ -34,6 +36,7 @@ public class SubclassPickerDrawer : PropertyDrawer
 
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
   {
+    // The menu can choose None or instantiate a subclass in the Inspector.
     Type t = fieldInfo.FieldType;
     if (t.IsArray && t.FullName.EndsWith("[]"))
     {

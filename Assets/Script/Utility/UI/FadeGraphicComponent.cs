@@ -42,6 +42,7 @@ namespace Utility.UI
       if (alphaObjects.Length == 0)
         return;
 
+      // Stop the previous sequence so two coroutines do not change one target's alpha.
       StopFadeSequence();
 
       foreach (AlphaObject alphaObject in alphaObjects)
@@ -113,7 +114,7 @@ namespace Utility.UI
     {
       var halfTime = cycleTime / 2f;
 
-      // Loop forever.
+      // Repeat fade out and in until StopFadeSequence is called.
       while (true)
       {
         yield return FadeCycle(target, halfTime);
@@ -128,6 +129,7 @@ namespace Utility.UI
     /// <returns>An IEnumerator for coroutine iteration.</returns>
     private IEnumerator FadeCycle(Component target, float halfTime)
     {
+      // Fade to zero during the first half, then restore the starting alpha.
       var startAlpha = target.GetAlpha();
 
       for (var t = 0f; t < halfTime; t += TimeStep)

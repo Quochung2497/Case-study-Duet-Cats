@@ -16,12 +16,14 @@ namespace Utility
     /// <typeparam name="T">The type of the object.</typeparam>
     /// <param name="obj">The object being checked.</param>
     /// <returns>The object itself if it exists and not destroyed, null otherwise.</returns>
+    // A destroyed Unity object may still have a managed reference; return a real null.
     public static T OrNull<T>(this T obj)
       where T : Object => obj ? obj : null;
 
     public static T GetOrAdd<T>(this GameObject GO)
       where T : Component
     {
+      // Reuse an existing scene component before calling AddComponent.
       var component = GO.GetComponent<T>();
       if (component == null)
         component = GO.AddComponent<T>();

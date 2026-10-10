@@ -14,6 +14,7 @@ namespace Game
 
         public void AwakeInitialize()
         {
+            // Validate song, chart, and timing before building the note system.
             if (_notePrefab == null || _settings == null || _layout == null ||
                 _settings.Chart == null || _settings.Song == null ||
                 _settings.TravelSeconds <= 0f || _settings.HitWindowSeconds < 0f)
@@ -22,6 +23,7 @@ namespace Game
                 return;
             }
 
+            // The prefab needs a Kinematic Rigidbody2D and trigger collider for 2D hit events.
             if (!_notePrefab.TryGetComponent<Rigidbody2D>(out var rb) ||
                 rb.bodyType != RigidbodyType2D.Kinematic ||
                 !_notePrefab.TryGetComponent<CircleCollider2D>(out var col) || !col.isTrigger)
@@ -32,9 +34,11 @@ namespace Game
 
             try
             {
+                // Parse once during setup and pass the sorted NoteEvent array to the manager.
                 var chart = NoteChart.Parse(_settings.Chart.text);
                 _layout.Refresh();
                 var manager = gameObject.GetOrAdd<NoteManager>();
+                // Keep AudioSource and NoteManager on this GameObject so setup can wire both.
                 var music = gameObject.GetOrAdd<AudioSource>();
                 manager.Initialize(chart, _notePrefab, _settings, _layout, music);
             }

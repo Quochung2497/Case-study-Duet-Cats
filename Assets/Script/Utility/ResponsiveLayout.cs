@@ -14,6 +14,7 @@ namespace Game
         // World-space values that note spawning and cat movement can read later.
         public readonly struct LayoutData
         {
+            // Precomputed world-space coordinates shared by cats and notes.
             public readonly float PlayLeft, PlayRight, LeftMinX, LeftMaxX, RightMinX, RightMaxX;
             public readonly float LeftCatX, RightCatX, CatY, HitY, SpawnY;
             public readonly float Lane0X, Lane1X, Lane2X, Lane3X;
@@ -44,6 +45,7 @@ namespace Game
 
             public float LaneX(int lane)
             {
+                // Convert chart lanes 0-3 into world X positions for this orientation.
                 switch (lane)
                 {
                     case 0: return Lane0X; // left outer
@@ -99,7 +101,7 @@ namespace Game
         private PlayableSettings GetSettings()
         {
 #if UNITY_EDITOR
-            // Injector runs in Play mode. Scene Gizmos still need the selected asset in Edit mode.
+            // Injection is unavailable in Edit mode, so find the installer for Gizmo previews.
             if (!Application.isPlaying)
             {
                 var installer = FindFirstObjectByType<PlayableInstaller>();
@@ -130,10 +132,12 @@ namespace Game
                 return;
 
             var cam = gameplayCamera;
+            // Choose the portrait or landscape profile and recalculate world-space bounds.
             var p = cam.aspect < 1f ? settings.Portrait : settings.Landscape;
             var next = LayoutMath.Calculate(cam.transform.position.x, cam.transform.position.y,
                 cam.orthographicSize, cam.aspect, p);
 
+            // Do not emit Changed when the effective layout is unchanged.
             if (_hasData && _data.SameAs(next) && _pixelRect == cam.pixelRect)
                 return;
 
@@ -148,6 +152,7 @@ namespace Game
 
         public float ScreenToWorldX(float screenX, float screenY)
         {
+            // Input uses screen pixels, while CatAction clamps world-space positions.
             var cam = GetRefs()?.Camera;
             if (cam == null) return 0f;
             return cam.ScreenToWorldPoint(new Vector3(screenX, screenY, cam.nearClipPlane)).x;
@@ -213,6 +218,7 @@ namespace Game
         public static ResponsiveLayout.LayoutData Calculate(float camX, float camY,
             float orthoSize, float aspect, PlayableSettings.LayoutProfile p)
         {
+            // Derive the play area from camera size, margins, and maximum width.
             var height = Math.Max(0.1f, orthoSize * 2f);
             var cameraWidth = height * Math.Max(0.01f, aspect);
             var availableWidth = Math.Max(0.1f, cameraWidth - 2f * Math.Max(0f, p.sideMargin));
@@ -222,6 +228,7 @@ namespace Game
             var gap = Math.Min(Math.Max(0f, p.centerGap), playWidth * 0.35f);
             var halfCat = Math.Min(Math.Max(0f, p.catHalfWidth), (playWidth - gap) * 0.25f);
 
+            // Keep each cat in its own half with the configured center gap.
             var leftMin = playLeft + halfCat;
             var leftMax = camX - gap * 0.5f - halfCat;
             var rightMin = camX + gap * 0.5f + halfCat;
@@ -229,6 +236,7 @@ namespace Game
             var defaultX = Clamp(p.catX, 0f, 0.5f);
             var outer = Clamp(p.outerLaneX, 0f, 0.5f);
             var inner = Clamp(p.innerLaneX, 0f, 0.5f);
+            // Keep the outer lane before the inner lane even if the profile values are reversed.
             if (outer > inner)
             {
                 var tmp = outer;

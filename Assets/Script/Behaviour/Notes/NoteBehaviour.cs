@@ -23,6 +23,7 @@ namespace Game
 
         private void Awake()
         {
+            // Resolve the layer in Awake, after Unity allows its API to be called.
             _catLayer = LayerMask.NameToLayer("Cat");
             CacheComponents();
         }
@@ -40,6 +41,7 @@ namespace Game
 
         public void ResetForReuse()
         {
+            // Clear data from the previous use before this note leaves the pool.
             _hasNote = false;
             _placed = false;
             Note = default;
@@ -48,6 +50,7 @@ namespace Game
 
         public void SetNote(NoteEvent note, Sprite sprite, float radius)
         {
+            // Reuse one prefab for all note types by changing its sprite and collider radius.
             Note = note;
             _hasNote = true;
             _placed = false;
@@ -66,6 +69,7 @@ namespace Game
                 NoteTimeline.GetY(layout.SpawnY, layout.HitY, songTime,
                     Note.SpawnTime, travelSeconds));
 
+            // Set the initial position directly; use Rigidbody2D.MovePosition on later ticks.
             if (!_placed)
             {
                 _rb.position = pos;
@@ -81,11 +85,13 @@ namespace Game
 
         private void HandleTriggerEnter(Collider2D other)
         {
+            // Only the cat on the note's side may hit it.
             if (!_hasNote || other.gameObject.layer != _catLayer ||
                 !other.TryGetComponent<CatBehaviour>(out var cat) ||
                 cat.IsLeft != (Note.Lane < 2)) return;
 
             var type = Note.VisualType;
+            // Let the cat handle feedback and ScoreManager award points for the visual type.
             cat.OnNoteHit(type);
             _score.AddPoints(type);
             Release();
@@ -93,6 +99,7 @@ namespace Game
 
         public void Release()
         {
+            // _hasNote prevents returning the same instance to the pool twice.
             if (!_hasNote) return;
             _hasNote = false;
             _pool?.Release(this);

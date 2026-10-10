@@ -12,6 +12,7 @@ namespace Control.Cat
             _animation = animation;
         }
 
+        // GameManager passes the outcome through CatBehaviour before entering Result.
         public void SetOutcome(bool won) => _won = won;
 
         public override void EnterState() => _animation.PlayResult(_won);

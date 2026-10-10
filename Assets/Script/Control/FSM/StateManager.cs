@@ -5,6 +5,7 @@ namespace Control
 {
   public class StateManager<TState> : IStateMachine<TState> where TState : Enum
   {
+    // The dictionary finds a destination state by its enum key.
     private readonly Dictionary<TState, IState<TState>> _states;
     private IState<TState> _currentState;
 
@@ -16,6 +17,7 @@ namespace Control
         throw new ArgumentNullException(nameof(states));
 
       _states = new Dictionary<TState, IState<TState>>();
+      // Reject duplicate keys while building the FSM so transitions stay unambiguous.
       foreach (IState<TState> state in states)
       {
         if (state == null)
@@ -32,6 +34,7 @@ namespace Control
       foreach (IState<TState> state in _states.Values)
         state.SetStateMachine(this);
 
+      // Enter the initial state as soon as the state machine is built.
       _currentState.EnterState();
     }
 
@@ -44,9 +47,11 @@ namespace Control
     {
       if (!_states.TryGetValue(nextStateKey, out IState<TState> nextState))
         throw new ArgumentException("The destination state must be registered.", nameof(nextStateKey));
+      // Transitioning to the current state does not call Exit or Enter again.
       if (ReferenceEquals(_currentState, nextState))
         return;
 
+      // A transition exits the old state and enters the new one immediately.
       _currentState.ExitState();
       _currentState = nextState;
       _currentState.EnterState();

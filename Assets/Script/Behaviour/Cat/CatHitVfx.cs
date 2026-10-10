@@ -14,6 +14,7 @@ namespace Game
 
         private void Awake()
         {
+            // The effect sits under MouthAnchor, so find CatBehaviour in a parent.
             _cat = GetComponentInParent<CatBehaviour>();
             _particles = gameObject.GetOrAdd<ParticleSystem>();
             var main = _particles.main;
@@ -43,11 +44,13 @@ namespace Game
             main.startSize = vfx.size;
             main.startColor = Color.white;
 
+            // A new hit clears the previous burst and reuses the same ParticleSystem.
             _particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             _particles.Play(true);
 
             for (var i = 0; i < vfx.count; i++)
             {
+                // t spreads particles across a fan; jitter and speed add slight variation.
                 var t = vfx.count == 1 ? 0.5f : i / (float)(vfx.count - 1);
                 var tilt = _cat.IsLeft ? -_settings.HitVfxTiltDegrees : _settings.HitVfxTiltDegrees;
                 var angle = tilt + (t - 0.5f) * _settings.HitVfxSpreadDegrees

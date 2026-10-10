@@ -14,6 +14,7 @@ namespace Game
 
         protected override NoteBehaviour OnCreate()
         {
+            // Parent a new instance under the manager and tell it which pool to return to.
             var note = Object.Instantiate(Prefab, _parent);
             note.SetPool(PoolInstance);
             note.gameObject.SetActive(false);
