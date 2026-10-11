@@ -10,7 +10,7 @@ namespace Game
         [SerializeField] private Canvas canvas;
         [SerializeField] private TextMeshProUGUI label;
 
-        [Inject] private PlayableSettings _settings;
+        [Inject] private HitTextSettings _settings;
         [Inject] private LayoutSceneRefs _scene;
 
         private CatBehaviour _cat;
