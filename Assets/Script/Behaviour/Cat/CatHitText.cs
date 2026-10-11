@@ -13,7 +13,7 @@ namespace Game
         [Inject] private HitTextSettings _settings;
         [Inject] private LayoutSceneRefs _scene;
 
-        private CatBehaviour _cat;
+        private ICatBehaviour _cat;
         private RectTransform _rect;
         private int _lastWord = -1;
         private float _startedAt;

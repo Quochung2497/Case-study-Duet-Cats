@@ -24,8 +24,8 @@ namespace Game
 #endif
 
         private INoteManager _notes;
-        private CatBehaviour _leftCat;
-        private CatBehaviour _rightCat;
+        private ICatBehaviour _leftCat;
+        private ICatBehaviour _rightCat;
         private IInputReader _input;
         private IScoreManager _score;
         private IGameFlowSettings _settings;
@@ -39,7 +39,7 @@ namespace Game
         public event Action<GameState> StateChanged;
         public event Action StartTransitionBegan;
 
-        public void Initialize(INoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
+        public void Initialize(INoteManager notes, ICatBehaviour leftCat, ICatBehaviour rightCat,
             IInputReader input, IGameFlowSettings settings, IScoreManager score)
         {
             // The installer supplies dependencies; this manager listens for input and note outcomes.
@@ -157,8 +157,8 @@ namespace Game
             if (State != GameState.Result) return;
 
             State = GameState.Cta;
-            _leftCat.gameObject.SetActive(false);
-            _rightCat.gameObject.SetActive(false);
+            _leftCat.SetVisible(false);
+            _rightCat.SetVisible(false);
             StateChanged?.Invoke(State);
         }
     }

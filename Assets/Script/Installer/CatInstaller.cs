@@ -12,16 +12,17 @@ namespace Game
         [Inject] private IInputReader _input;
         [Inject] private ResponsiveLayout _layout;
         [Inject] private LayoutSceneRefs _sceneRefs;
+        [Inject] private CatAnimationSet _animations;
 
         public void AwakeInitialize()
         {
             // Build the cat FSMs only after both cat objects have the required components.
-            if (_sceneRefs == null || _sceneRefs.LeftCat == null ||
+            if (_animations == null || _sceneRefs == null || _sceneRefs.LeftCat == null ||
                 _sceneRefs.RightCat == null ||
                 !_sceneRefs.LeftCat.TryGetComponent(out CatBehaviour leftCat) ||
                 !_sceneRefs.RightCat.TryGetComponent(out CatBehaviour rightCat))
             {
-                Debug.LogError("PlayableInstaller needs both cat references.", this);
+                Debug.LogError("CatInstaller needs animation settings and both cat references.", this);
                 return;
             }
 
@@ -47,14 +48,23 @@ namespace Game
                 return;
             }
 
-            cat.SetupAnimation(spine);
+            var skeletonData = spine.SkeletonDataAsset != null
+                ? spine.SkeletonDataAsset.GetSkeletonData(false)
+                : null;
+            if (!_animations.TryValidate(skeletonData, out var error))
+            {
+                Debug.LogError($"{cat.name} has invalid animation settings: {error}", cat);
+                return;
+            }
+
             // Give each cat its own action, states, and FSM so their drag and hit flows stay separate.
-            ICatAction action = new CatAction(left);
-            var hitState = new CatHitState(cat);
-            var resultState = new CatResultState(cat);
+            var action = new CatAction(left);
+            var animation = new CatAnimationController(spine, _animations);
+            var hitState = new CatHitState(animation);
+            var resultState = new CatResultState(animation);
             var fsm = new StateBuilder<CatState>()
-                .Add(new CatIdleState(cat))
-                .Add(new CatPlayingState(cat))
+                .Add(new CatIdleState(animation))
+                .Add(new CatPlayingState(animation))
                 .Add(hitState)
                 .Add(resultState)
                 .Build(CatState.Idle);

@@ -7,6 +7,8 @@ namespace Game
     public class ScoreUI : MonoBehaviour
     {
         [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private string loseParameterName = "Lose";
+        [SerializeField] private bool loseParameterValue = true;
         [Inject] private IGameState _game;
         [Inject] private IScoreManager _score;
 
@@ -36,9 +38,9 @@ namespace Game
 
         private void OnGameStateChanged(GameState state)
         {
-            // Set the status Animator's Lose flag only for a losing Result.
+            // Set the configured Animator parameter only for a losing Result.
             if (state == GameState.Result && !_game.Won && _statusAnimator != null)
-                _statusAnimator.SetBool("Lose", true);
+                _statusAnimator.SetBool(loseParameterName, loseParameterValue);
         }
 
         private void Refresh()

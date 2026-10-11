@@ -12,6 +12,7 @@ namespace Game
         // Keep Inspector references in one place instead of duplicating them in each installer.
         [Header("Scriptable Objects")]
         [SerializeField] private PlayableSettings settings;
+        [SerializeField] private CatAnimationSet catAnimations;
         [SerializeField] private InputReader inputReader;
 
         [Header("Prefabs")]
@@ -30,6 +31,7 @@ namespace Game
 
         // Injector scans [Provide] methods and registers each object by its return type.
         [Provide] public IScoreRules ProvideScoreRules() => settings.ScoreRules;
+        [Provide] public CatAnimationSet ProvideCatAnimationSet() => catAnimations;
         [Provide] public INoteSettings ProvideNoteSettings() => settings.Notes;
         [Provide] public HitVfxSettings ProvideHitVfxSettings() => settings.HitVfx;
         [Provide] public HitTextSettings ProvideHitTextSettings() => settings.HitText;
