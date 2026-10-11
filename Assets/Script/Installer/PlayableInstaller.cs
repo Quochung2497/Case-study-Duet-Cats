@@ -23,6 +23,7 @@ namespace Game
         [SerializeField] private Transform rightCat;
         [SerializeField] private ResponsiveLayout responsiveLayout;
         [SerializeField] private NoteManager noteManager;
+        [SerializeField] private ScoreManager scoreManager;
 
         public SceneVisualSettings SceneVisuals => settings != null ? settings.SceneVisuals : null;
         public LayoutSceneRefs SceneRefs => new(gameplayCamera, leftCat, rightCat);
@@ -38,7 +39,8 @@ namespace Game
         [Provide] public IInputReader ProvideInputReader() => inputReader;
         [Provide] public NoteBehaviour ProvideNotePrefab() => notePrefab;
         [Provide] public ResponsiveLayout ProvideLayout() => responsiveLayout;
-        [Provide] public NoteManager ProvideNoteManager() => noteManager;
+        [Provide] public INoteManager ProvideNoteManager() => noteManager;
+        [Provide] public IScoreManager ProvideScoreManager() => scoreManager;
         [Provide] public IGameState ProvideGameState() => gameObject.GetOrAdd<GameManager>();
 
         private void Awake() => ValidateReferences();

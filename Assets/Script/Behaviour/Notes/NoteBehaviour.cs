@@ -8,7 +8,7 @@ namespace Game
     public class NoteBehaviour : MonoBehaviour, IPoolObject<NoteBehaviour>
     {
         private int _catLayer;
-        private ScoreManager _score;
+        private IScoreManager _score;
 
         private IObjectPool<NoteBehaviour> _pool;
         private SpriteRenderer _sprite;
@@ -30,7 +30,6 @@ namespace Game
 
         private void CacheComponents()
         {
-            _score = ScoreManager.Instance;
             _sprite = gameObject.GetOrAdd<SpriteRenderer>();
             _defaultSprite = _sprite.sprite;
             TryGetComponent(out _rb);
@@ -38,6 +37,12 @@ namespace Game
         }
 
         public void SetPool(IObjectPool<NoteBehaviour> pool) => _pool = pool;
+
+        public void Initialize(IObjectPool<NoteBehaviour> pool, IScoreManager score)
+        {
+            SetPool(pool);
+            _score = score;
+        }
 
         public void ResetForReuse()
         {

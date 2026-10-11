@@ -10,7 +10,7 @@ namespace Game
         event Action<GameState> StateChanged;
         event Action StartTransitionBegan;
 
-        void Initialize(NoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
-            IInputReader input, IGameFlowSettings settings);
+        void Initialize(INoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
+            IInputReader input, IGameFlowSettings settings, IScoreManager score);
     }
 }
