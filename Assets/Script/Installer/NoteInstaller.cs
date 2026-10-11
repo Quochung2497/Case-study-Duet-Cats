@@ -9,17 +9,18 @@ namespace Game
     public sealed class NoteInstaller : MonoBehaviour, IInstaller
     {
         [Inject] private NoteBehaviour _notePrefab;
+        [Inject] private NoteManager _manager;
         [Inject] private PlayableSettings _settings;
         [Inject] private ResponsiveLayout _layout;
 
         public void AwakeInitialize()
         {
             // Validate song, chart, and timing before building the note system.
-            if (_notePrefab == null || _settings == null || _layout == null ||
+            if (_notePrefab == null || _manager == null || _settings == null || _layout == null ||
                 _settings.Chart == null || _settings.Song == null ||
                 _settings.TravelSeconds <= 0f || _settings.HitWindowSeconds < 0f)
             {
-                Debug.LogError("NoteInstaller needs a note prefab, chart, song and valid timing settings.", this);
+                Debug.LogError("NoteInstaller needs a note manager, prefab, chart, song and valid timing settings.", this);
                 return;
             }
 
@@ -37,10 +38,9 @@ namespace Game
                 // Parse once during setup and pass the sorted NoteEvent array to the manager.
                 var chart = NoteChart.Parse(_settings.Chart.text);
                 _layout.Refresh();
-                var manager = gameObject.GetOrAdd<NoteManager>();
-                // Keep AudioSource and NoteManager on this GameObject so setup can wire both.
-                var music = gameObject.GetOrAdd<AudioSource>();
-                manager.Initialize(chart, _notePrefab, _settings, _layout, music);
+                // Keep the music source with the injected NoteManager, even if the installer moves.
+                var music = _manager.gameObject.GetOrAdd<AudioSource>();
+                _manager.Initialize(chart, _notePrefab, _settings, _layout, music);
             }
             catch (FormatException ex)
             {
