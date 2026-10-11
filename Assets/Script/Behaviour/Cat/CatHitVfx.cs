@@ -7,7 +7,7 @@ namespace Game
 {
     public class CatHitVfx : MonoBehaviour
     {
-        [Inject] private PlayableSettings _settings;
+        [Inject] private HitVfxSettings _settings;
 
         private CatBehaviour _cat;
         private ParticleSystem _particles;

@@ -30,6 +30,9 @@ namespace Game
         // Injector scans [Provide] methods and registers each object by its return type.
         [Provide] public PlayableSettings ProvideSettings() => settings;
         [Provide] public IScoreRules ProvideScoreRules() => settings.ScoreRules;
+        [Provide] public INoteSettings ProvideNoteSettings() => settings.Notes;
+        [Provide] public HitVfxSettings ProvideHitVfxSettings() => settings.HitVfx;
+        [Provide] public HitTextSettings ProvideHitTextSettings() => settings.HitText;
         [Provide] public LayoutSceneRefs ProvideSceneRefs() => SceneRefs;
         [Provide] public IInputReader ProvideInputReader() => inputReader;
         [Provide] public NoteBehaviour ProvideNotePrefab() => notePrefab;
