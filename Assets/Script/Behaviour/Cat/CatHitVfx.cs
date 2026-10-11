@@ -9,7 +9,7 @@ namespace Game
     {
         [Inject] private HitVfxSettings _settings;
 
-        private CatBehaviour _cat;
+        private ICatBehaviour _cat;
         private ParticleSystem _particles;
 
         private void Awake()

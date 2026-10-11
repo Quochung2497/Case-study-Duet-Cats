@@ -3,25 +3,14 @@ using Control;
 using Control.Cat;
 using Control.Note;
 using Input;
-using Spine.Unity;
 using UnityEngine;
-using Utility;
 
 namespace Game
 {
-    public class CatBehaviour : MonoBehaviour, ICatAnimation
+    public class CatBehaviour : MonoBehaviour, ICatBehaviour
     {
         // This behaviour bridges Unity input and transforms with plain-C# action and FSM logic.
         #region Fields and events
-
-        private static readonly CatClip[] IdleClips =
-        {
-            CatClip.IdleStart,
-            CatClip.IdlePlaying,
-            CatClip.IdleHungry,
-            CatClip.IdleLiemchan,
-            CatClip.IdleYawn
-        };
 
         private IInputReader _input;
         private ResponsiveLayout _layout;
@@ -29,9 +18,6 @@ namespace Game
         private IStateMachine<CatState> _fsm;
         private CatHitState _hitState;
         private CatResultState _resultState;
-        private SkeletonAnimation _spine;
-        private int _animVersion;
-        private int _lastIdle = -1;
         private bool _left;
         private bool _playing;
         private bool _subscribed;
@@ -56,8 +42,6 @@ namespace Game
             _layout = layout;
             if (isActiveAndEnabled) Subscribe();
         }
-
-        public void SetupAnimation(SkeletonAnimation spine) => _spine = spine;
 
         public void OnNoteHit(NoteVisualType type)
         {
@@ -96,44 +80,7 @@ namespace Game
             _fsm.TransitionToState(CatState.Result);
         }
 
-        #endregion
-
-        #region Animation
-
-        public void PlayIdle(Action onComplete)
-        {
-            // Pick one of five idle clips at random without repeating the previous one.
-            var index = UnityEngine.Random.Range(0, IdleClips.Length);
-            if (index == _lastIdle) index = (index + 1) % IdleClips.Length;
-            _lastIdle = index;
-            Play(IdleClips[index], false, onComplete);
-        }
-
-        public void PlayPlaying() => Play(CatClip.Listening, true);
-
-        public void PlayResult(bool won) =>
-            Play(won ? CatClip.Victory : CatClip.MissObjectLose2, true);
-
-        public void PlayHit(NoteVisualType type, Action onComplete)
-        {
-            // Normal uses either single-object clip; other visual types currently use EatShot.
-            var clip = type == NoteVisualType.Normal
-                ? (UnityEngine.Random.value < 0.5f ? CatClip.EatingSingle1 : CatClip.EatingSingle2)
-                : CatClip.EatShot;
-            Play(clip, false, onComplete);
-        }
-
-        private void Play(CatClip clip, bool loop, Action onComplete = null)
-        {
-            // The version ignores completion callbacks from animations replaced mid-play.
-            var version = ++_animVersion;
-            var entry = AnimationPlayer.Play(_spine, clip, loop);
-            if (onComplete != null)
-                entry.Complete += _ =>
-                {
-                    if (version == _animVersion) onComplete();
-                };
-        }
+        public void SetVisible(bool visible) => gameObject.SetActive(visible);
 
         #endregion
 
