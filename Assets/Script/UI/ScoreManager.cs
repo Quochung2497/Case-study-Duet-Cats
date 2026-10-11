@@ -1,12 +1,12 @@
 using System;
 using Control.Note;
 using UnityEngine;
-using Utility;
 using Utility.DependencyInjection;
 
 namespace Game
 {
-    public class ScoreManager : Singleton<ScoreManager>
+    [DisallowMultipleComponent]
+    public class ScoreManager : MonoBehaviour, IScoreManager
     {
         // Score has one owner; UI listens for changes and reads the Score property.
         [Inject] private IScoreRules _rules;

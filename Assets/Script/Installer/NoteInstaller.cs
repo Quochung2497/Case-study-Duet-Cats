@@ -1,7 +1,6 @@
 using System;
 using Control.Note;
 using UnityEngine;
-using Utility;
 using Utility.DependencyInjection;
 
 namespace Game
@@ -9,14 +8,15 @@ namespace Game
     public sealed class NoteInstaller : MonoBehaviour, IInstaller
     {
         [Inject] private NoteBehaviour _notePrefab;
-        [Inject] private NoteManager _manager;
+        [Inject] private INoteManager _manager;
         [Inject] private INoteSettings _settings;
         [Inject] private ResponsiveLayout _layout;
+        [Inject] private IScoreManager _score;
 
         public void AwakeInitialize()
         {
             // Validate song, chart, and timing before building the note system.
-            if (_notePrefab == null || _manager == null || _settings == null || _layout == null ||
+            if (_notePrefab == null || _manager == null || _settings == null || _layout == null || _score == null ||
                 _settings.Chart == null || _settings.Song == null ||
                 _settings.TravelSeconds <= 0f || _settings.HitWindowSeconds < 0f)
             {
@@ -38,9 +38,7 @@ namespace Game
                 // Parse once during setup and pass the sorted NoteEvent array to the manager.
                 var chart = NoteChart.Parse(_settings.Chart.text);
                 _layout.Refresh();
-                // Keep the music source with the injected NoteManager, even if the installer moves.
-                var music = _manager.gameObject.GetOrAdd<AudioSource>();
-                _manager.Initialize(chart, _notePrefab, _settings, _layout, music);
+                _manager.Initialize(chart, _notePrefab, _settings, _layout, _score);
             }
             catch (FormatException ex)
             {

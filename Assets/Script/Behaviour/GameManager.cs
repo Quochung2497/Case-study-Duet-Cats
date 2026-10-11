@@ -23,11 +23,11 @@ namespace Game
         [SerializeField] private bool ignoreMisses;
 #endif
 
-        private NoteManager _notes;
+        private INoteManager _notes;
         private CatBehaviour _leftCat;
         private CatBehaviour _rightCat;
         private IInputReader _input;
-        private ScoreManager _score;
+        private IScoreManager _score;
         private IGameFlowSettings _settings;
         private float _ctaAt;
         private float _startAt;
@@ -39,8 +39,8 @@ namespace Game
         public event Action<GameState> StateChanged;
         public event Action StartTransitionBegan;
 
-        public void Initialize(NoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
-            IInputReader input, IGameFlowSettings settings)
+        public void Initialize(INoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
+            IInputReader input, IGameFlowSettings settings, IScoreManager score)
         {
             // The installer supplies dependencies; this manager listens for input and note outcomes.
             _notes = notes;
@@ -48,8 +48,7 @@ namespace Game
             _rightCat = rightCat;
             _input = input;
             _settings = settings;
-            _score = ScoreManager.Instance;
-
+            _score = score;
             _input.PointerDown += OnPointerDown;
             _notes.NoteMissed += OnNoteMissed;
             _notes.SongFinished += OnSongFinished;

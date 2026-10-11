@@ -2519,39 +2519,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 40
   m_TargetDisplay: 0
---- !u!114 &700000000000000030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778261691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ba94c5f97ec4302a5c7d2a419c784b1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Game.GameUIController
-  panels:
-  - view: {fileID: 700000000000000020}
-    visibleInStates: 00000000
-    showDelaySeconds: 0
-    fadeOnStartTransition: 1
-  - view: {fileID: 700000000000000021}
-    visibleInStates: 0100000002000000
-    showDelaySeconds: 2
-    fadeOnStartTransition: 0
-  - view: {fileID: 904151404}
-    visibleInStates: 01000000
-    showDelaySeconds: 0
-    fadeOnStartTransition: 0
-  - view: {fileID: 1693791939}
-    visibleInStates: 03000000
-    showDelaySeconds: 0
-    fadeOnStartTransition: 0
-  - view: {fileID: 1651857776}
-    visibleInStates: 03000000
-    showDelaySeconds: 3
-    fadeOnStartTransition: 0
 --- !u!1 &1813642030
 GameObject:
   m_ObjectHideFlags: 0
@@ -2799,6 +2766,7 @@ MonoBehaviour:
   rightCat: {fileID: 1426200096}
   responsiveLayout: {fileID: 494238429}
   noteManager: {fileID: 2129736038}
+  scoreManager: {fileID: 700000000000000001}
 --- !u!114 &2084441004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3058,6 +3026,39 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &700000000000000030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778261691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ba94c5f97ec4302a5c7d2a419c784b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.GameUIController
+  panels:
+  - view: {fileID: 700000000000000020}
+    visibleInStates: 00000000
+    showDelaySeconds: 0
+    fadeOnStartTransition: 1
+  - view: {fileID: 700000000000000021}
+    visibleInStates: 0100000002000000
+    showDelaySeconds: 2
+    fadeOnStartTransition: 0
+  - view: {fileID: 904151404}
+    visibleInStates: 01000000
+    showDelaySeconds: 0
+    fadeOnStartTransition: 0
+  - view: {fileID: 1693791939}
+    visibleInStates: 03000000
+    showDelaySeconds: 0
+    fadeOnStartTransition: 0
+  - view: {fileID: 1651857776}
+    visibleInStates: 03000000
+    showDelaySeconds: 3
+    fadeOnStartTransition: 0
 --- !u!1001 &1300300178013730425
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -6,27 +6,28 @@ namespace Game
 {
     public sealed class GameInstaller : MonoBehaviour, IInstaller
     {
-        [Inject] private NoteManager _notes;
+        [Inject] private INoteManager _notes;
         [Inject] private IGameState _manager;
         [Inject] private LayoutSceneRefs _sceneRefs;
         [Inject] private IInputReader _input;
         [Inject] private IGameFlowSettings _settings;
+        [Inject] private IScoreManager _score;
 
         public void AwakeInitialize()
         {
             // Find CatBehaviour on each scene transform and wire both into GameManager.
             if (_notes == null || _manager == null || _sceneRefs == null ||
-                _input == null || _settings == null ||
+                _input == null || _settings == null || _score == null ||
                 _sceneRefs.LeftCat == null || _sceneRefs.RightCat == null ||
                 !_sceneRefs.LeftCat.TryGetComponent(out CatBehaviour leftCat) ||
                 !_sceneRefs.RightCat.TryGetComponent(out CatBehaviour rightCat))
             {
-                Debug.LogError("GameInstaller needs the note manager and both cats.", this);
+                Debug.LogError("GameInstaller needs the note manager, both cats, input, settings, and score manager.", this);
                 return;
             }
 
             _manager.Initialize(_notes, leftCat, rightCat,
-                _input, _settings);
+                _input, _settings, _score);
         }
 
         public void StartInitialize() { }

@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using Control.Note;
 using UnityEngine;
+using Utility;
 
 namespace Game
 {
     [DisallowMultipleComponent]
-    public class NoteManager : MonoBehaviour
+    public class NoteManager : MonoBehaviour, INoteManager
     {
         private readonly List<NoteBehaviour> _active = new();
         private NoteEvent[] _chart;
@@ -22,14 +23,14 @@ namespace Game
         public event Action SongFinished;
 
         public void Initialize(NoteEvent[] chart, NoteBehaviour prefab,
-            INoteSettings settings, ResponsiveLayout layout, AudioSource music)
+            INoteSettings settings, ResponsiveLayout layout, IScoreManager score)
         {
             // The installer provides dependencies once; the pool creates notes when needed.
             _chart = chart;
-            _pool = new NotePool(prefab, transform);
+            _pool = new NotePool(prefab, transform, score);
             _settings = settings;
             _layout = layout;
-            _music = music;
+            _music = gameObject.GetOrAdd<AudioSource>();
         }
 
         public bool StartSong()

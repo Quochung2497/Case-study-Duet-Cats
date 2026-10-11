@@ -8,8 +8,8 @@ namespace Game
     {
         [SerializeField] private TMP_Text scoreText;
         [Inject] private IGameState _game;
+        [Inject] private IScoreManager _score;
 
-        private ScoreManager _score;
         private Animator _statusAnimator;
 
         private void Awake()
@@ -22,7 +22,6 @@ namespace Game
         private void OnEnable()
         {
             // On enable, display the current score before waiting for later changes.
-            _score = ScoreManager.Instance;
             _score.ScoreChanged += Refresh;
             _game.StateChanged += OnGameStateChanged;
             Refresh();
