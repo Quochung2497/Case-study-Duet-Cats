@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game
 {
     [Serializable]
-    public sealed class HitTextSettings
+    public class HitTextSettings
     {
         [SerializeField] private TMP_FontAsset hitTextFont;
         [SerializeField] private string[] hitWords = { "Tasty!", "Sweet!", "Yummy!" };

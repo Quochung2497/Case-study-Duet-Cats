@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game
 {
     [Serializable]
-    public sealed class HitVfxSettings
+    public class HitVfxSettings
     {
         [Serializable]
         public struct HitVfxProfile

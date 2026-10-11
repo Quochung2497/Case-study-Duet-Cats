@@ -10,7 +10,7 @@ namespace Game
     {
         [Inject] private NoteBehaviour _notePrefab;
         [Inject] private NoteManager _manager;
-        [Inject] private PlayableSettings _settings;
+        [Inject] private INoteSettings _settings;
         [Inject] private ResponsiveLayout _layout;
 
         public void AwakeInitialize()
