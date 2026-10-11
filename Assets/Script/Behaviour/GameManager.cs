@@ -28,7 +28,7 @@ namespace Game
         private CatBehaviour _rightCat;
         private IInputReader _input;
         private ScoreManager _score;
-        private PlayableSettings _settings;
+        private IGameFlowSettings _settings;
         private float _ctaAt;
         private float _startAt;
         private bool _starting;
@@ -40,7 +40,7 @@ namespace Game
         public event Action StartTransitionBegan;
 
         public void Initialize(NoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
-            IInputReader input, PlayableSettings settings)
+            IInputReader input, IGameFlowSettings settings)
         {
             // The installer supplies dependencies; this manager listens for input and note outcomes.
             _notes = notes;

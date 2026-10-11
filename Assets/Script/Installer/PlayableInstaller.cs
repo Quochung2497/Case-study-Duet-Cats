@@ -24,15 +24,16 @@ namespace Game
         [SerializeField] private ResponsiveLayout responsiveLayout;
         [SerializeField] private NoteManager noteManager;
 
-        public PlayableSettings Settings => settings;
+        public SceneVisualSettings SceneVisuals => settings != null ? settings.SceneVisuals : null;
         public LayoutSceneRefs SceneRefs => new(gameplayCamera, leftCat, rightCat);
 
         // Injector scans [Provide] methods and registers each object by its return type.
-        [Provide] public PlayableSettings ProvideSettings() => settings;
         [Provide] public IScoreRules ProvideScoreRules() => settings.ScoreRules;
         [Provide] public INoteSettings ProvideNoteSettings() => settings.Notes;
         [Provide] public HitVfxSettings ProvideHitVfxSettings() => settings.HitVfx;
         [Provide] public HitTextSettings ProvideHitTextSettings() => settings.HitText;
+        [Provide] public IGameFlowSettings ProvideGameFlowSettings() => settings.GameFlow;
+        [Provide] public SceneVisualSettings ProvideSceneVisualSettings() => settings.SceneVisuals;
         [Provide] public LayoutSceneRefs ProvideSceneRefs() => SceneRefs;
         [Provide] public IInputReader ProvideInputReader() => inputReader;
         [Provide] public NoteBehaviour ProvideNotePrefab() => notePrefab;

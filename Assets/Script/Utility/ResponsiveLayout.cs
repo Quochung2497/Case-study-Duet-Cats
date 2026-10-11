@@ -77,7 +77,7 @@ namespace Game
 
         [SerializeField] private bool showGizmos = true;
 
-        [Inject] private PlayableSettings _settings;
+        [Inject] private SceneVisualSettings _settings;
         [Inject] private LayoutSceneRefs _refs;
         private LayoutData _data;
         private bool _hasData;
@@ -98,14 +98,14 @@ namespace Game
         private void Update() => Refresh();
         private void OnValidate() => _hasData = false;
 
-        private PlayableSettings GetSettings()
+        private SceneVisualSettings GetSettings()
         {
 #if UNITY_EDITOR
             // Injection is unavailable in Edit mode, so find the installer for Gizmo previews.
             if (!Application.isPlaying)
             {
                 var installer = FindFirstObjectByType<PlayableInstaller>();
-                return installer != null ? installer.Settings : null;
+                return installer != null ? installer.SceneVisuals : null;
             }
 #endif
             return _settings;
@@ -216,7 +216,7 @@ namespace Game
     internal static class LayoutMath
     {
         public static ResponsiveLayout.LayoutData Calculate(float camX, float camY,
-            float orthoSize, float aspect, PlayableSettings.LayoutProfile p)
+            float orthoSize, float aspect, SceneVisualSettings.LayoutProfile p)
         {
             // Derive the play area from camera size, margins, and maximum width.
             var height = Math.Max(0.1f, orthoSize * 2f);

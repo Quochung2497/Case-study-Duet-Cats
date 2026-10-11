@@ -10,7 +10,7 @@ namespace Game
         [Inject] private GameManager _manager;
         [Inject] private LayoutSceneRefs _sceneRefs;
         [Inject] private IInputReader _input;
-        [Inject] private PlayableSettings _settings;
+        [Inject] private IGameFlowSettings _settings;
 
         public void AwakeInitialize()
         {

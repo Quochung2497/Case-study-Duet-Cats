@@ -81,28 +81,31 @@ MonoBehaviour:
     hitTextRise: 0.15
     hitTextWorldWidth: 1.8
     hitTextFontSize: 40
-  portrait:
-    sideMargin: 0.07
-    maxPlayWidth: 4.6
-    centerGap: 0
-    catHalfWidth: 0.5
-    catX: 0.24
-    outerLaneX: 0.12
-    innerLaneX: 0.36
-    catY: 0.225
-    hitY: 0.31
-    spawnY: 1
-  landscape:
-    sideMargin: 0.4
-    maxPlayWidth: 7.5
-    centerGap: 0.25
-    catHalfWidth: 0.35
-    catX: 0.25
-    outerLaneX: 0.15
-    innerLaneX: 0.35
-    catY: 0.2
-    hitY: 0.3
-    spawnY: 1
+  sceneVisuals:
+    portrait:
+      sideMargin: 0.07
+      maxPlayWidth: 4.6
+      centerGap: 0
+      catHalfWidth: 0.5
+      catX: 0.24
+      outerLaneX: 0.12
+      innerLaneX: 0.36
+      catY: 0.225
+      hitY: 0.31
+      spawnY: 1
+    landscape:
+      sideMargin: 0.4
+      maxPlayWidth: 7.5
+      centerGap: 0.25
+      catHalfWidth: 0.35
+      catX: 0.25
+      outerLaneX: 0.15
+      innerLaneX: 0.35
+      catY: 0.2
+      hitY: 0.3
+      spawnY: 1
+    portraitBackground: {fileID: -4500712686193554759, guid: 9c3de7bc6677f1346aa3b1fd158b63da, type: 3}
+    landscapeBackground: {fileID: -7536193595675217356, guid: 4bf0465b9e7bf9c4fb5d34a35d60c5df, type: 3}
   notes:
     chart: {fileID: 4900000, guid: 110dbcee4b9a41278c92efa4afdbf360, type: 3}
     song: {fileID: 8300000, guid: 94bf464c2300ed649afe23e3edc6949f, type: 3}
@@ -119,11 +122,10 @@ MonoBehaviour:
     rightStrong: {fileID: 5698676842844662037, guid: ebc774ca2a077ee4e800fcdde1b78ff3, type: 3}
     rightLong: {fileID: -8626142277367449852, guid: c285373c5e412224c9f0ee309acb56f2, type: 3}
     lolipopLong: {fileID: -9067253411846048059, guid: 5308ea1581bd8b04c8afaf0549d370fb, type: 3}
-  startTransitionSeconds: 1.5
-  resultSeconds: 3
-  ctaReloadSeconds: 1
-  portraitBackground: {fileID: -4500712686193554759, guid: 9c3de7bc6677f1346aa3b1fd158b63da, type: 3}
-  landscapeBackground: {fileID: -7536193595675217356, guid: 4bf0465b9e7bf9c4fb5d34a35d60c5df, type: 3}
+  gameFlow:
+    startTransitionSeconds: 1.5
+    resultSeconds: 3
+    ctaReloadSeconds: 1
   score:
     normalPoints: 2
     strongPoints: 5
