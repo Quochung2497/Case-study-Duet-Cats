@@ -12,7 +12,7 @@ namespace Game
         private NoteEvent[] _chart;
         private NoteTimeline _timeline;
         private NotePool _pool;
-        private PlayableSettings _settings;
+        private INoteSettings _settings;
         private ResponsiveLayout _layout;
         private AudioSource _music;
         private double _songStartDsp;
@@ -22,7 +22,7 @@ namespace Game
         public event Action SongFinished;
 
         public void Initialize(NoteEvent[] chart, NoteBehaviour prefab,
-            PlayableSettings settings, ResponsiveLayout layout, AudioSource music)
+            INoteSettings settings, ResponsiveLayout layout, AudioSource music)
         {
             // The installer provides dependencies once; the pool creates notes when needed.
             _chart = chart;
