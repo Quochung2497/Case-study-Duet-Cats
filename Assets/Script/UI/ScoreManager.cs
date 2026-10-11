@@ -9,21 +9,21 @@ namespace Game
     public class ScoreManager : Singleton<ScoreManager>
     {
         // Score has one owner; UI listens for changes and reads the Score property.
-        [Inject] private PlayableSettings _settings;
+        [Inject] private IScoreRules _rules;
 
         public int Score { get; private set; }
         public event Action ScoreChanged;
 
         public void AddPoints(NoteVisualType type)
         {
-            if (_settings == null)
+            if (_rules == null)
             {
-                Debug.LogError("ScoreManager needs PlayableSettings.", this);
+                Debug.LogError("ScoreManager needs score rules.", this);
                 return;
             }
 
-            // PlayableSettings defines the point value for each note type.
-            Score += _settings.GetPoints(type);
+            // Use the injected rule; tests can supply a fake through their injector.
+            Score += _rules.GetPoints(type);
             ScoreChanged?.Invoke();
         }
 
