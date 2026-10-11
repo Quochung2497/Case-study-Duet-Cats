@@ -6,7 +6,7 @@ namespace Game
 {
     public class BackgroundBehaviour : MonoBehaviour
     {
-        [Inject] private PlayableSettings _settings;
+        [Inject] private SceneVisualSettings _settings;
         [Inject] private LayoutSceneRefs _refs;
 
         private SpriteRenderer _renderer;

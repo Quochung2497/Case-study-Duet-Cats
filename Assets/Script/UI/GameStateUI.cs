@@ -16,7 +16,7 @@ namespace Game
         [SerializeField] private bool blocksRaycasts;
 
         [Inject] private GameManager _game;
-        [Inject] private PlayableSettings _settings;
+        [Inject] private IGameFlowSettings _settings;
 
         private CanvasGroup _group;
         private Component _alpha;
