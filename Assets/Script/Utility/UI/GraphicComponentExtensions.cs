@@ -62,19 +62,19 @@ namespace Utility
       }
       else if (comp is Graphic graphic)
       {
-        Color c = graphic.color;
+        var c = graphic.color;
         c.a = alpha;
         graphic.color = c;
       }
       else if (comp is TextMeshProUGUI tmp)
       {
-        Color c = tmp.color;
+        var c = tmp.color;
         c.a = alpha;
         tmp.color = c;
       }
       else if (comp is SpriteRenderer sr)
       {
-        Color c = sr.color;
+        var c = sr.color;
         c.a = alpha;
         sr.color = c;
       }

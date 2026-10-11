@@ -28,12 +28,12 @@ This Unity WebGL playable uses one scene for portrait and landscape. `Responsive
 ## 3. Design Patterns and Architecture Decisions
 
 - **Installer/DI:** `PlayableInstaller` centralizes scene references; `Injector` supplies them to input, cat, note, and game installers.
-- **Data-driven/ScriptableObject:** JSON defines note time, lane, and type. `PlayableSettings` selects song/chart and exposes timing, layout, score, and feedback tuning without code edits.
-- **Logic and interfaces:** `CatAction`, `NoteChart`, and `NoteTimeline` sit outside MonoBehaviours. `IInputReader`, `ICatAction`, and `ICatAnimation` separate input, dragging, and animation consumers from their implementations.
+- **Data-driven/ScriptableObject:** JSON defines note time, lane, and type. `PlayableSettings` selects song/chart and exposes timing, layout, score, and feedback tuning. `CatAnimationSet` configures Spine clips, variants, and loop flags.
+- **Logic and interfaces:** `CatAction`, `NoteChart`, and `NoteTimeline` sit outside MonoBehaviours. `IInputReader`, `ICatAction`, `ICatAnimation`, and `ICatBehaviour` separate input, dragging, animation, and cat gameplay consumers from their implementations.
 - **FSM/Builder:** Each cat uses `StateManager<CatState>` for `Idle`, `Playing`, `Hit`, and `Result`, assembled by `StateBuilder<CatState>`; dragging remains in `CatAction`.
-- **Responsive layout/animation mapping:** `ResponsiveLayout` uses camera size and portrait/landscape profiles for one scene; `AnimationPlayer` centralizes Spine clip names behind `CatClip` values.
+- **Responsive layout/animation mapping:** `ResponsiveLayout` uses camera size and portrait/landscape profiles for one scene; `CatAnimationSet` maps gameplay cues to Spine clips, which each cat's `CatAnimationController` plays.
 - **Object Pool:** `NotePool` reuses one note prefab through Unity's `ObjectPool<T>`, changing its sprite and collider radius per type instead of repeatedly instantiating notes.
-- **Singleton:** `Injector` and `ScoreManager` use the shared `Singleton<T>` utility.
+- **Singleton:** `Injector` uses the shared `Singleton<T>` utility. The scene provides one `ScoreManager` through `IScoreManager`.
 - **Events:** Pointer, hit, miss, song, score, and state events notify consumers without producers referencing their listeners.
 
 ## 4. Trade-offs, Simplifications, and Improvement Ideas
@@ -41,7 +41,7 @@ This Unity WebGL playable uses one scene for portrait and landscape. `Responsive
 Personal constraints left only 1–2 days to build this playable, so I prioritized a working game loop and mobile WebGL build:
 
 - **Game flow:** `GameManager` changes states directly. Applying the existing FSM framework to `Start`, `Playing`, `Result`, and `CTA` would isolate phase-specific transitions and timers.
-- **Coupling:** Some plain C# logic and UI still use concrete classes, such as `GameStateUI` reading `GameManager`. Small interfaces for state data and events would improve isolation.
+- **Coupling:** UI and setup both use `IGameState`. The interface includes initialization as well as state reading; separate setup and read-only contracts could narrow it if the project grows.
 - **Notes:** All types use instant collision. Long notes could gain hold duration and begin/end handling.
 - **Chart data:** I used a custom JSON chart with only the fields this loop needs (`id`, `spawnTime`, `lane`, `visualType`). The original JSON's field meanings were unclear, and I could not seek clarification over the weekend. A later pass could map and validate the original data against the music.
 - **Variants:** One song/chart, a one-miss loss, and total score keep the run short. Chart variants, song start/end points, and session duration could enable A/B tests on the same game loop.

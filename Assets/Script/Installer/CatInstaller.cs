@@ -19,8 +19,8 @@ namespace Game
             // Build the cat FSMs only after both cat objects have the required components.
             if (_animations == null || _sceneRefs == null || _sceneRefs.LeftCat == null ||
                 _sceneRefs.RightCat == null ||
-                !_sceneRefs.LeftCat.TryGetComponent(out CatBehaviour leftCat) ||
-                !_sceneRefs.RightCat.TryGetComponent(out CatBehaviour rightCat))
+                !_sceneRefs.LeftCat.TryGetComponent<CatBehaviour>(out var leftCat) ||
+                !_sceneRefs.RightCat.TryGetComponent<CatBehaviour>(out var rightCat))
             {
                 Debug.LogError("CatInstaller needs animation settings and both cat references.", this);
                 return;
