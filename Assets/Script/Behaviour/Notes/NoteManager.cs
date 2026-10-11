@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Game
 {
+    [DisallowMultipleComponent]
     public class NoteManager : MonoBehaviour
     {
         private readonly List<NoteBehaviour> _active = new();

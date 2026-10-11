@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection;
 using Input;
 using UnityEngine;
 using Utility;
@@ -5,7 +7,7 @@ using Utility.DependencyInjection;
 
 namespace Game
 {
-    public sealed class PlayableInstaller : MonoBehaviour, IInstaller, IDependencyProvider
+    public sealed class PlayableInstaller : MonoBehaviour, IDependencyProvider
     {
         // Keep Inspector references in one place instead of duplicating them in each installer.
         [Header("Scriptable Objects")]
@@ -34,33 +36,29 @@ namespace Game
         [Provide] public NoteManager ProvideNoteManager() => noteManager;
         [Provide] public GameManager ProvideGameManager() => gameObject.GetOrAdd<GameManager>();
 
-        public void AwakeInitialize()
+        private void Awake() => ValidateReferences();
+
+#if UNITY_EDITOR
+        private void OnValidate() => ValidateReferences();
+#endif
+
+        private void ValidateReferences()
         {
-            // Stop setup early if required scene references are missing.
-            if (settings == null || inputReader == null || notePrefab == null ||
-                gameplayCamera == null ||
-                leftCat == null || rightCat == null || responsiveLayout == null ||
-                noteManager == null)
+            // Treat every serialized Unity object field as a required Inspector reference.
+            var missing = new List<string>();
+            var fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            foreach (var field in fields)
             {
-                Debug.LogError("PlayableInstaller has missing references.", this);
-                return;
+                if (!field.IsDefined(typeof(SerializeField), false) ||
+                    !typeof(Object).IsAssignableFrom(field.FieldType))
+                    continue;
+
+                if ((Object)field.GetValue(this) == null)
+                    missing.Add(field.Name);
             }
 
-            // Enable input only after validating scene references.
-            inputReader.Initialize();
-        }
-
-        public void StartInitialize() { }
-
-        private void Awake() => AwakeInitialize();
-        private void Start() => StartInitialize();
-        private void OnDestroy() => ShutdownInput();
-
-        private void ShutdownInput()
-        {
-            // Remove Input System callbacks when the scene is destroyed or reloaded.
-            if (inputReader != null)
-                inputReader.Shutdown();
+            if (missing.Count > 0)
+                Debug.LogError($"PlayableInstaller is missing: {string.Join(", ", missing)}.", this);
         }
     }
 }

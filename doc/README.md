@@ -15,7 +15,7 @@ This Unity WebGL playable uses one scene for portrait and landscape. `Responsive
 | `Assets/Script/UI` and `Settings` | UI, score storage, and settings types. |
 | `Assets/Script/Utility` | Input, layout, injection, pooling, animation helpers. |
 
-`PlayableInstaller` provides scene references through `Injector`, keeping wiring out of gameplay scripts. `CatInstaller` builds each cat's action and FSM; `NoteInstaller` sets up the chart, pool, and `NoteManager`; `GameInstaller` connects them to `GameManager`. Hits update cats and score, while misses/song completion update game state. UI listens to score and state events.
+`PlayableInstaller` provides scene references through `Injector`, keeping wiring out of gameplay scripts. `InputInstaller` owns the input lifecycle; `CatInstaller` builds each cat's action and FSM; `NoteInstaller` sets up the chart, pool, and `NoteManager`; `GameInstaller` connects them to `GameManager`. Hits update cats and score, while misses/song completion update game state. UI listens to score and state events.
 
 ## 2. Key Gameplay Systems
 
@@ -27,7 +27,7 @@ This Unity WebGL playable uses one scene for portrait and landscape. `Responsive
 
 ## 3. Design Patterns and Architecture Decisions
 
-- **Installer/DI:** `PlayableInstaller` centralizes scene references; `Injector` supplies them to cat, note, and game installers.
+- **Installer/DI:** `PlayableInstaller` centralizes scene references; `Injector` supplies them to input, cat, note, and game installers.
 - **Data-driven/ScriptableObject:** JSON defines note time, lane, and type. `PlayableSettings` selects song/chart and exposes timing, layout, score, and feedback tuning without code edits.
 - **Logic and interfaces:** `CatAction`, `NoteChart`, and `NoteTimeline` sit outside MonoBehaviours. `IInputReader`, `ICatAction`, and `ICatAnimation` separate input, dragging, and animation consumers from their implementations.
 - **FSM/Builder:** Each cat uses `StateManager<CatState>` for `Idle`, `Playing`, `Hit`, and `Result`, assembled by `StateBuilder<CatState>`; dragging remains in `CatAction`.
