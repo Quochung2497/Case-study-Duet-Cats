@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -25,7 +25,7 @@ public class SubclassPickerDrawer : PropertyDrawer
     return EditorGUI.GetPropertyHeight(property);
   }
 
-  IEnumerable GetClasses(Type baseType)
+  IEnumerable<Type> GetClasses(Type baseType)
   {
     // List concrete subclasses of the base type in the same assembly.
     return Assembly
@@ -37,20 +37,20 @@ public class SubclassPickerDrawer : PropertyDrawer
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
   {
     // The menu can choose None or instantiate a subclass in the Inspector.
-    Type t = fieldInfo.FieldType;
+    var t = fieldInfo.FieldType;
     if (t.IsArray && t.FullName.EndsWith("[]"))
     {
       t = Type.GetType(t.FullName.Substring(0, t.FullName.Length - 2));
     }
-    string typeName = property.managedReferenceValue?.GetType().Name ?? "Not set";
+    var typeName = property.managedReferenceValue?.GetType().Name ?? "Not set";
 
-    Rect dropdownRect = position;
+    var dropdownRect = position;
     dropdownRect.x += EditorGUIUtility.labelWidth + 2;
     dropdownRect.width -= EditorGUIUtility.labelWidth + 2;
     dropdownRect.height = EditorGUIUtility.singleLineHeight;
     if (EditorGUI.DropdownButton(dropdownRect, new(typeName), FocusType.Keyboard))
     {
-      GenericMenu menu = new GenericMenu();
+      var menu = new GenericMenu();
 
       // null
       menu.AddItem(
@@ -64,7 +64,7 @@ public class SubclassPickerDrawer : PropertyDrawer
       );
 
       // inherited types
-      foreach (Type type in GetClasses(t))
+      foreach (var type in GetClasses(t))
       {
         menu.AddItem(
           new GUIContent(type.Name),

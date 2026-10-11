@@ -45,7 +45,7 @@ namespace Utility.UI
       // Stop the previous sequence so two coroutines do not change one target's alpha.
       StopFadeSequence();
 
-      foreach (AlphaObject alphaObject in alphaObjects)
+      foreach (var alphaObject in alphaObjects)
       {
         if (alphaObject.targetComp)
         {
@@ -80,11 +80,11 @@ namespace Utility.UI
 
     private void InitializeAlphaObjects()
     {
-      for (int i = 0; i < alphaObjects.Length; i++)
+      for (var i = 0; i < alphaObjects.Length; i++)
       {
         if (alphaObjects[i].targetComp == null)
         {
-          Component targetComp = alphaObjects[i].gameObject.FindAlphaComponent();
+          var targetComp = alphaObjects[i].gameObject.FindAlphaComponent();
           if (targetComp != null)
           {
             alphaObjects[i].targetComp = targetComp;
@@ -154,7 +154,7 @@ namespace Utility.UI
     /// </summary>
     private void ResetAlpha()
     {
-      foreach (AlphaObject alphaObject in alphaObjects)
+      foreach (var alphaObject in alphaObjects)
       {
         if (alphaObject.targetComp)
         {

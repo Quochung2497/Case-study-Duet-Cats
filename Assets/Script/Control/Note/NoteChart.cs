@@ -42,7 +42,7 @@ namespace Control.Note
                     entry.lane < 0 || entry.lane > 3 ||
                     float.IsNaN(entry.spawnTime) || float.IsInfinity(entry.spawnTime) ||
                     entry.spawnTime < 0f ||
-                    !Enum.TryParse(entry.visualType, true, out NoteVisualType visualType) ||
+                    !Enum.TryParse<NoteVisualType>(entry.visualType, true, out var visualType) ||
                     !Enum.IsDefined(typeof(NoteVisualType), visualType))
                     throw new FormatException($"Invalid note at chart index {i}.");
 
