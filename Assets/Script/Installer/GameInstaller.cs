@@ -7,7 +7,7 @@ namespace Game
     public sealed class GameInstaller : MonoBehaviour, IInstaller
     {
         [Inject] private NoteManager _notes;
-        [Inject] private GameManager _manager;
+        [Inject] private IGameState _manager;
         [Inject] private LayoutSceneRefs _sceneRefs;
         [Inject] private IInputReader _input;
         [Inject] private IGameFlowSettings _settings;

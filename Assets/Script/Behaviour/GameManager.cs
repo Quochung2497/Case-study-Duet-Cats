@@ -14,7 +14,7 @@ namespace Game
         Cta
     }
 
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour, IGameState
     {
         // This state tracks the whole run, separate from each cat's animation FSM.
 #if UNITY_EDITOR
@@ -112,7 +112,7 @@ namespace Game
         }
         private void OnSongFinished() => EndGame(true);
 
-        public void StartGame()
+        private void StartGame()
         {
             // _starting prevents repeated taps from starting multiple transitions.
             if (State != GameState.Start || _starting) return;
@@ -152,7 +152,7 @@ namespace Game
             StateChanged?.Invoke(State);
         }
 
-        public void ShowCta()
+        private void ShowCta()
         {
             // Hide both cats before notifying the UI that CTA has begun.
             if (State != GameState.Result) return;

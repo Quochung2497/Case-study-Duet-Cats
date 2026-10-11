@@ -7,7 +7,7 @@ namespace Game
     public class ScoreUI : MonoBehaviour
     {
         [SerializeField] private TMP_Text scoreText;
-        [Inject] private GameManager _game;
+        [Inject] private IGameState _game;
 
         private ScoreManager _score;
         private Animator _statusAnimator;

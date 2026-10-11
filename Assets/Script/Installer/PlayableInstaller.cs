@@ -39,7 +39,7 @@ namespace Game
         [Provide] public NoteBehaviour ProvideNotePrefab() => notePrefab;
         [Provide] public ResponsiveLayout ProvideLayout() => responsiveLayout;
         [Provide] public NoteManager ProvideNoteManager() => noteManager;
-        [Provide] public GameManager ProvideGameManager() => gameObject.GetOrAdd<GameManager>();
+        [Provide] public IGameState ProvideGameState() => gameObject.GetOrAdd<GameManager>();
 
         private void Awake() => ValidateReferences();
 
