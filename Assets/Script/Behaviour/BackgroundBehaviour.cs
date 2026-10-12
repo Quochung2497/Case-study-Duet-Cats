@@ -8,6 +8,7 @@ namespace Game
     {
         [Inject] private SceneVisualSettings _settings;
         [Inject] private LayoutSceneRefs _refs;
+        [Inject] private IViewport _viewport;
 
         private SpriteRenderer _renderer;
         private Sprite _sprite;
@@ -17,22 +18,32 @@ namespace Game
 
         private void Awake() => SetupRenderer();
 
+        private void OnEnable()
+        {
+            if (_viewport == null) return;
+            _viewport.Changed += ApplyBackground;
+            if (_viewport.HasViewport) ApplyBackground(_viewport.IsPortrait);
+        }
+
+        private void OnDisable()
+        {
+            if (_viewport != null) _viewport.Changed -= ApplyBackground;
+        }
+
         private void SetupRenderer()
         {
             _renderer = gameObject.GetOrAdd<SpriteRenderer>();
             _renderer.sortingOrder = -100;
         }
 
-        private void LateUpdate() => RefreshBackground();
-
-        private void RefreshBackground()
+        private void ApplyBackground(bool isPortrait)
         {
             var cam = _refs?.Camera;
             if (_settings == null || cam == null || !cam.orthographic)
                 return;
 
             // Choose the background sprite for the current screen orientation.
-            var sprite = cam.aspect < 1f
+            var sprite = isPortrait
                 ? _settings.PortraitBackground
                 : _settings.LandscapeBackground;
             if (sprite == null)

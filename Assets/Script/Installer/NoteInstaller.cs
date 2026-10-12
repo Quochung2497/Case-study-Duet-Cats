@@ -37,7 +37,7 @@ namespace Game
             {
                 // Parse once during setup and pass the sorted NoteEvent array to the manager.
                 var chart = NoteChart.Parse(_settings.Chart.text);
-                _layout.Refresh();
+                _layout.RecalculateLayout();
                 _manager.Initialize(chart, _notePrefab, _settings, _layout, _score);
             }
             catch (FormatException ex)

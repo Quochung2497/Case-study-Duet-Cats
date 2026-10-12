@@ -26,7 +26,7 @@ namespace Game
                 return;
             }
 
-            _layout.Refresh();
+            _layout.RecalculateLayout();
             Build(leftCat, left: true);
             Build(rightCat, left: false);
         }
