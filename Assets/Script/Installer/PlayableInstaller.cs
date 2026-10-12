@@ -13,6 +13,7 @@ namespace Game
         [Header("Scriptable Objects")]
         [SerializeField] private PlayableSettings settings;
         [SerializeField] private CatAnimationSet catAnimations;
+        [SerializeField] private CtaAnimationSet ctaAnimations;
         [SerializeField] private InputReader inputReader;
 
         [Header("Prefabs")]
@@ -23,15 +24,18 @@ namespace Game
         [SerializeField] private Transform leftCat;
         [SerializeField] private Transform rightCat;
         [SerializeField] private ResponsiveLayout responsiveLayout;
+        [SerializeField] private ViewportController viewportController;
         [SerializeField] private NoteManager noteManager;
         [SerializeField] private ScoreManager scoreManager;
 
         public SceneVisualSettings SceneVisuals => settings != null ? settings.SceneVisuals : null;
         public LayoutSceneRefs SceneRefs => new(gameplayCamera, leftCat, rightCat);
+        public IViewport Viewport => viewportController;
 
         // Injector scans [Provide] methods and registers each object by its return type.
         [Provide] public IScoreRules ProvideScoreRules() => settings.ScoreRules;
         [Provide] public CatAnimationSet ProvideCatAnimationSet() => catAnimations;
+        [Provide] public CtaAnimationSet ProvideCtaAnimationSet() => ctaAnimations;
         [Provide] public INoteSettings ProvideNoteSettings() => settings.Notes;
         [Provide] public HitVfxSettings ProvideHitVfxSettings() => settings.HitVfx;
         [Provide] public HitTextSettings ProvideHitTextSettings() => settings.HitText;
@@ -41,6 +45,7 @@ namespace Game
         [Provide] public IInputReader ProvideInputReader() => inputReader;
         [Provide] public NoteBehaviour ProvideNotePrefab() => notePrefab;
         [Provide] public ResponsiveLayout ProvideLayout() => responsiveLayout;
+        [Provide] public IViewport ProvideViewport() => viewportController;
         [Provide] public INoteManager ProvideNoteManager() => noteManager;
         [Provide] public IScoreManager ProvideScoreManager() => scoreManager;
         [Provide] public IGameState ProvideGameState() => gameObject.GetOrAdd<GameManager>();

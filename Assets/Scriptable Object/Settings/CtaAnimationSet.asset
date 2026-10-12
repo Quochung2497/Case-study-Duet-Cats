@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b29a4846aa84ae6b0a25560adcfd8e3, type: 3}
+  m_Name: CtaAnimationSet
+  m_EditorClassIdentifier: Assembly-CSharp::Game.CtaAnimationSet
+  portraitClip: {fileID: 7400000, guid: 163de9f41db3d074f8e31c895ed03634, type: 2}
+  landscapeClip: {fileID: 7400000, guid: 999971080651b9d488fbb4f2f705d395, type: 2}

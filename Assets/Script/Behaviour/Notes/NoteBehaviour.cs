@@ -64,7 +64,7 @@ namespace Game
             if (_collider != null) _collider.radius = radius;
         }
 
-        public void Place(double songTime, ResponsiveLayout.LayoutData layout,
+        public void Place(double songTime, LayoutData layout,
             float travelSeconds)
         {
             if (!_hasNote || _rb == null) return;

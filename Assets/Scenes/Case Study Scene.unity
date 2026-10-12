@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 249271383}
   - component: {fileID: 249271385}
   - component: {fileID: 249271384}
+  - component: {fileID: 700000000000000032}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -320,6 +321,7 @@ GameObject:
   - component: {fileID: 382690233}
   - component: {fileID: 382690235}
   - component: {fileID: 382690234}
+  - component: {fileID: 700000000000000031}
   m_Layer: 0
   m_Name: Logo
   m_TagString: Untagged
@@ -395,6 +397,7 @@ GameObject:
   - component: {fileID: 403112163}
   - component: {fileID: 403112165}
   - component: {fileID: 403112164}
+  - component: {fileID: 403112166}
   m_Layer: 0
   m_Name: Song Card 1
   m_TagString: Untagged
@@ -459,6 +462,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 403112162}
   m_CullTransparentMesh: 1
+--- !u!114 &403112166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403112162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 0, y: 1}
+    anchorMax: {x: 0, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    anchoredPosition: {x: 296, y: -292.5, z: 0}
+    sizeDelta: {x: 446, y: 585}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 0, y: 1}
+    anchorMax: {x: 0, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    anchoredPosition: {x: 330.79, y: 3.19, z: 0}
+    sizeDelta: {x: 400.35, y: 421.32}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
 --- !u!1 &420826242
 GameObject:
   m_ObjectHideFlags: 0
@@ -1341,12 +1374,12 @@ RectTransform:
   m_Children:
   - {fileID: 945957760}
   - {fileID: 904151401}
-  m_Father: {fileID: 1778261692}
+  m_Father: {fileID: 700000000000000025}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -38, y: -140}
-  m_SizeDelta: {x: 449.59998, y: 324}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &790282780
 MonoBehaviour:
@@ -1435,6 +1468,7 @@ GameObject:
   - component: {fileID: 904151402}
   - component: {fileID: 904151403}
   - component: {fileID: 904151404}
+  - component: {fileID: 904151405}
   m_Layer: 0
   m_Name: Scores
   m_TagString: Untagged
@@ -1502,6 +1536,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.ScoreUI
   scoreText: {fileID: 734101678}
+  loseParameterName: Lose
+  loseParameterValue: 1
 --- !u!114 &904151404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1514,8 +1550,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a6e21345e254555a4f06e4967b58c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.GameStateUI
-  disableWhenHidden: 1
+  disableWhenHidden: 0
   blocksRaycasts: 0
+--- !u!114 &904151405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904151400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 1, y: 0}
+    anchorMax: {x: 1, y: 0}
+    pivot: {x: 1, y: 0}
+    anchoredPosition: {x: -51, y: 0, z: 0}
+    sizeDelta: {x: 313.09998, y: 161.9}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 1, y: 0}
+    anchorMax: {x: 1, y: 0}
+    pivot: {x: 1, y: 0}
+    anchoredPosition: {x: -17, y: -32, z: 0}
+    sizeDelta: {x: 267.1, y: 111.46}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
 --- !u!4 &923182326 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3965517138381034504, guid: 027a181afb62e284aaf5bbeb94183471, type: 3}
@@ -1769,6 +1835,7 @@ GameObject:
   m_Component:
   - component: {fileID: 945957760}
   - component: {fileID: 945957761}
+  - component: {fileID: 945957762}
   m_Layer: 0
   m_Name: Hearts
   m_TagString: Untagged
@@ -1823,6 +1890,36 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &945957762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945957759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 1, y: 1}
+    anchorMax: {x: 1, y: 1}
+    pivot: {x: 1, y: 1}
+    anchoredPosition: {x: 0, y: 0, z: 0}
+    sizeDelta: {x: 333, y: 189}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 1, y: 1}
+    anchorMax: {x: 1, y: 1}
+    pivot: {x: 1, y: 1}
+    anchoredPosition: {x: -17.00002, y: 0, z: 0}
+    sizeDelta: {x: 269, y: 135.32}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
 --- !u!1 &953685138
 GameObject:
   m_ObjectHideFlags: 0
@@ -2236,6 +2333,8 @@ GameObject:
   - component: {fileID: 1651857773}
   - component: {fileID: 1651857775}
   - component: {fileID: 1651857776}
+  - component: {fileID: 1651857777}
+  - component: {fileID: 700000000000000034}
   m_Layer: 0
   m_Name: CTA Panel
   m_TagString: Untagged
@@ -2340,6 +2439,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.GameStateUI
   disableWhenHidden: 1
   blocksRaycasts: 0
+--- !u!114 &1651857777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651857771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 0.5, y: 0.5}
+    anchorMax: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0.5}
+    anchoredPosition: {x: 0, y: -81.5, z: 0}
+    sizeDelta: {x: 1066, y: 1443.6}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 0.5, y: 0.5}
+    anchorMax: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0.5}
+    anchoredPosition: {x: 0, y: -94.51, z: 0}
+    sizeDelta: {x: 1066, y: 977.81}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
 --- !u!1 &1693791936
 GameObject:
   m_ObjectHideFlags: 0
@@ -2428,6 +2557,7 @@ GameObject:
   - component: {fileID: 1778261694}
   - component: {fileID: 1778261693}
   - component: {fileID: 700000000000000030}
+  - component: {fileID: 700000000000000035}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -2447,7 +2577,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 790282779}
+  - {fileID: 700000000000000025}
   - {fileID: 205816101}
   m_Father: {fileID: 1086099142}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2644,6 +2774,7 @@ GameObject:
   - component: {fileID: 1999200581}
   - component: {fileID: 1999200583}
   - component: {fileID: 1999200582}
+  - component: {fileID: 1999200584}
   m_Layer: 0
   m_Name: Song Card 2
   m_TagString: Untagged
@@ -2708,6 +2839,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1999200580}
   m_CullTransparentMesh: 1
+--- !u!114 &1999200584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1999200580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 0, y: 1}
+    anchorMax: {x: 0, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    anchoredPosition: {x: 738, y: -289, z: 0}
+    sizeDelta: {x: 446, y: 585}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 0, y: 1}
+    anchorMax: {x: 0, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    anchoredPosition: {x: 727.53, y: 5.71, z: 0}
+    sizeDelta: {x: 400.35, y: 421.32}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
 --- !u!1 &2084441001
 GameObject:
   m_ObjectHideFlags: 0
@@ -2760,12 +2921,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.PlayableInstaller
   settings: {fileID: 11400000, guid: 5c8f9b7576354d69879b27d2c9f5fdae, type: 2}
   catAnimations: {fileID: 11400000, guid: 869b45ce46b446fcbac6e825aeefde79, type: 2}
+  ctaAnimations: {fileID: 11400000, guid: 3e0c3daa75524e8ba2fa8b0c408ae100, type: 2}
   inputReader: {fileID: 11400000, guid: 09c609e20f1986743b217b65892bd88a, type: 2}
   notePrefab: {fileID: 3458910673849965325, guid: 8a904f9413292f04e82f1c656eadf4df, type: 3}
   gameplayCamera: {fileID: 519420031}
   leftCat: {fileID: 923182326}
   rightCat: {fileID: 1426200096}
   responsiveLayout: {fileID: 494238429}
+  viewportController: {fileID: 700000000000000035}
   noteManager: {fileID: 2129736038}
   scoreManager: {fileID: 700000000000000001}
 --- !u!114 &2084441004
@@ -3027,6 +3190,73 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &700000000000000023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700000000000000024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 1, y: 1}
+    anchorMax: {x: 1, y: 1}
+    pivot: {x: 1, y: 1}
+    anchoredPosition: {x: -10, y: -245, z: 0}
+    sizeDelta: {x: 449.59998, y: 324}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 1, y: 1}
+    anchorMax: {x: 1, y: 1}
+    pivot: {x: 1, y: 1}
+    anchoredPosition: {x: -205.05, y: -60, z: 0}
+    sizeDelta: {x: 282.55, y: 194.79}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
+--- !u!1 &700000000000000024
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 700000000000000025}
+  - component: {fileID: 700000000000000023}
+  m_Layer: 0
+  m_Name: Status Layout
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &700000000000000025
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700000000000000024}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 790282779}
+  m_Father: {fileID: 1778261692}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -10, y: -245}
+  m_SizeDelta: {x: 449.59998, y: 324}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &700000000000000030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3049,7 +3279,7 @@ MonoBehaviour:
     showDelaySeconds: 2
     fadeOnStartTransition: 0
   - view: {fileID: 904151404}
-    visibleInStates: 01000000
+    visibleInStates: 0100000002000000
     showDelaySeconds: 0
     fadeOnStartTransition: 0
   - view: {fileID: 1693791939}
@@ -3060,6 +3290,90 @@ MonoBehaviour:
     visibleInStates: 03000000
     showDelaySeconds: 3
     fadeOnStartTransition: 0
+--- !u!114 &700000000000000031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382690232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 0.5, y: 1}
+    anchorMax: {x: 0.5, y: 1}
+    pivot: {x: 0.5, y: 1}
+    anchoredPosition: {x: 0, y: 0, z: 0}
+    sizeDelta: {x: 900, y: 900}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 0.5, y: 1}
+    anchorMax: {x: 0.5, y: 1}
+    pivot: {x: 0.5, y: 1}
+    anchoredPosition: {x: 0, y: 0, z: 0}
+    sizeDelta: {x: 691.76, y: 291.73}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
+--- !u!114 &700000000000000032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249271382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90824acb635d42fc9b76505bf5b7f83d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ResponsiveRectTransform
+  portrait:
+    anchorMin: {x: 0.5, y: 1}
+    anchorMax: {x: 0.5, y: 1}
+    pivot: {x: 0.5, y: 1}
+    anchoredPosition: {x: 0, y: -400, z: 0}
+    sizeDelta: {x: 900, y: 900}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  landscape:
+    anchorMin: {x: 0.5, y: 1}
+    anchorMax: {x: 0.5, y: 1}
+    pivot: {x: 0.5, y: 1}
+    anchoredPosition: {x: 0, y: -262, z: 0}
+    sizeDelta: {x: 742.15, y: 164.84}
+    rotation: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  portraitConfigured: 1
+  landscapeConfigured: 1
+--- !u!114 &700000000000000034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651857771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31e73d62c4bd43b6b4e5e2dee0368cba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.CtaAnimationVariant
+--- !u!114 &700000000000000035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778261691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b10b0057497846599551de24435e28df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.ViewportController
 --- !u!1001 &1300300178013730425
 PrefabInstance:
   m_ObjectHideFlags: 0
