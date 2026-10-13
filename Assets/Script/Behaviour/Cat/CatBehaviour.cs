@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Game
 {
-    public class CatBehaviour : MonoBehaviour, ICatBehaviour
+    public class CatBehaviour : MonoBehaviour, ICatBehaviour, ICatSetup
     {
         // This behaviour bridges Unity input and transforms with plain-C# action and FSM logic.
         #region Fields and events
@@ -62,10 +62,21 @@ namespace Game
 
         public void StartPlaying()
         {
-            // Stay Idle while dragging; return to Listening/Playing after release.
             _playing = true;
+            if (isActiveAndEnabled) Subscribe();
+
+            // Stay Idle while dragging; return to Listening/Playing after release.
             if (_fsm != null && !_action.IsDragging && _fsm.CurrentStateKey == CatState.Idle)
                 _fsm.TransitionToState(CatState.Playing);
+        }
+
+        public void ResetForRun()
+        {
+            // Prepare an initialized cat for another run without rebuilding its dependencies.
+            _playing = false;
+            CancelDrag();
+            _fsm.TransitionToState(CatState.Idle);
+            if (isActiveAndEnabled) Subscribe();
         }
 
         public void StopPlaying()
@@ -118,7 +129,7 @@ namespace Game
 
         private void Subscribe()
         {
-            // _subscribed prevents duplicate event subscriptions from Initialize and OnEnable.
+            // Repeated lifecycle calls must not register duplicate input callbacks.
             if (_subscribed || _input == null) return;
             _input.PointerDown += OnPointerDown;
             _input.PointerMoved += OnPointerMoved;

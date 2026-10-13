@@ -14,14 +14,14 @@ namespace Game
 
         private void Awake()
         {
-            // The effect sits under MouthAnchor, so find CatBehaviour in a parent.
-            _cat = GetComponentInParent<CatBehaviour>();
+            // The effect sits under MouthAnchor, so find the cat contract in a parent.
+            _cat = GetComponentInParent<ICatBehaviour>();
             _particles = gameObject.GetOrAdd<ParticleSystem>();
             var main = _particles.main;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
 
             if (_cat == null)
-                Debug.LogError("CatHitVfx needs a CatBehaviour in its parents.", this);
+                Debug.LogError("CatHitVfx needs an ICatBehaviour in its parents.", this);
         }
 
         private void OnEnable()
