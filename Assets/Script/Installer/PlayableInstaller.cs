@@ -20,14 +20,9 @@ namespace Game
         }
 
         // Keep Inspector references in one place instead of duplicating them in each installer.
-        [Header("Scriptable Objects")]
+        [Header("Playable configuration")]
         [SerializeField] private PlayableSettings settings;
-        [SerializeField] private CatAnimationSet catAnimations;
-        [SerializeField] private CtaAnimationSet ctaAnimations;
-        [SerializeField] private InputReader inputReader;
 
-        [Header("Song configuration")]
-        [SerializeField] private SongCatalog songCatalog;
         [Header("Song choices - select exactly one")]
         [SerializeField] private List<SongChoice> songChoices = new();
 
@@ -49,8 +44,8 @@ namespace Game
 
         // Injector scans [Provide] methods and registers each object by its return type.
         [Provide] public IScoreRules ProvideScoreRules() => settings.ScoreRules;
-        [Provide] public CatAnimationSet ProvideCatAnimationSet() => catAnimations;
-        [Provide] public CtaAnimationSet ProvideCtaAnimationSet() => ctaAnimations;
+        [Provide] public CatAnimationSet ProvideCatAnimationSet() => settings.CatAnimations;
+        [Provide] public CtaAnimationSet ProvideCtaAnimationSet() => settings.CtaAnimations;
         [Provide] public INoteSettings ProvideNoteSettings() => settings.Notes;
         [Provide]
         public SongDefinition ProvideSelectedSong()
@@ -60,14 +55,14 @@ namespace Game
             if (selected.Count != 1)
                 throw new System.InvalidOperationException("Tick Selected on exactly one song choice in PlayableInstaller.");
 
-            return songCatalog.Get(selected[0].id);
+            return settings.SongCatalog.Get(selected[0].id);
         }
         [Provide] public HitVfxSettings ProvideHitVfxSettings() => settings.HitVfx;
         [Provide] public HitTextSettings ProvideHitTextSettings() => settings.HitText;
         [Provide] public IGameFlowSettings ProvideGameFlowSettings() => settings.GameFlow;
         [Provide] public SceneVisualSettings ProvideSceneVisualSettings() => settings.SceneVisuals;
         [Provide] public LayoutSceneRefs ProvideSceneRefs() => SceneRefs;
-        [Provide] public IInputReader ProvideInputReader() => inputReader;
+        [Provide] public IInputReader ProvideInputReader() => settings.InputReader;
         [Provide] public NoteBehaviour ProvideNotePrefab() => notePrefab;
         [Provide] public IResponsiveLayout ProvideLayout() => responsiveLayout;
         [Provide] public IViewport ProvideViewport() => viewportController;
@@ -97,8 +92,8 @@ namespace Game
         private void SyncSongChoices()
         {
             var choices = new List<SongChoice>();
-            if (songCatalog != null)
-                foreach (var song in songCatalog.Songs)
+            if (settings != null && settings.SongCatalog != null)
+                foreach (var song in settings.SongCatalog.Songs)
                 {
                     // Match by ID so reordering or adding catalog entries preserves the scene choice.
                     var previous = songChoices.Find(choice => choice.id == song.Id);

@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c4fe491e6564903bcd5fa61a488a0f2, type: 3}
   m_Name: PlayableSettings
   m_EditorClassIdentifier: Assembly-CSharp::Game.PlayableSettings
+  songCatalog: {fileID: 11400000, guid: 76c88624e29264d58f4d6e5f81dbbb5f, type: 2}
+  catAnimations: {fileID: 11400000, guid: 869b45ce46b446fcbac6e825aeefde79, type: 2}
+  ctaAnimations: {fileID: 11400000, guid: 3e0c3daa75524e8ba2fa8b0c408ae100, type: 2}
+  inputReader: {fileID: 11400000, guid: 09c609e20f1986743b217b65892bd88a, type: 2}
   hitVfx:
     leftHitColor: {r: 1, g: 0.78, b: 0.19, a: 1}
     rightHitColor: {r: 1, g: 0.38, b: 0.65, a: 1}
