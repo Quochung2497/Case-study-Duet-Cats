@@ -39,32 +39,23 @@ namespace Game
             if (_settings == null || _particles == null || _cat == null) return;
 
             var vfx = _settings.GetHitVfx(type);
+
+            // Clear the previous hit before restarting the prefab's configured burst.
+            _particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
             var main = _particles.main;
             main.startLifetime = vfx.lifetime;
             main.startSize = vfx.size;
-            main.startColor = Color.white;
+            main.startSpeed = vfx.speed;
+            main.startColor = _settings.GetHitVfxStartColor(type, _cat.IsLeft);
 
-            // A new hit clears the previous burst and reuses the same ParticleSystem.
-            _particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            // Shape and direction are authored in the prefab; only the note's count changes here.
+            var emission = _particles.emission;
+            var burst = emission.GetBurst(0);
+            burst.count = new ParticleSystem.MinMaxCurve(vfx.count);
+            emission.SetBurst(0, burst);
+
             _particles.Play(true);
-
-            for (var i = 0; i < vfx.count; i++)
-            {
-                // t spreads particles across a fan; jitter and speed add slight variation.
-                var t = vfx.count == 1 ? 0.5f : i / (float)(vfx.count - 1);
-                var tilt = _cat.IsLeft ? -_settings.HitVfxTiltDegrees : _settings.HitVfxTiltDegrees;
-                var angle = tilt + (t - 0.5f) * _settings.HitVfxSpreadDegrees
-                    + Random.Range(-_settings.HitVfxAngleJitterDegrees, _settings.HitVfxAngleJitterDegrees);
-                var speed = vfx.speed * Random.Range(
-                    1f - _settings.HitVfxSpeedVariance, 1f + _settings.HitVfxSpeedVariance);
-                var particle = new ParticleSystem.EmitParams
-                {
-                    position = transform.position,
-                    velocity = Quaternion.Euler(0f, 0f, angle) * Vector3.up * speed,
-                    startColor = _settings.GetHitVfxColor(type, _cat.IsLeft, t)
-                };
-                _particles.Emit(particle, 1);
-            }
         }
     }
 }
