@@ -11,8 +11,9 @@ namespace Game
         bool IsLeft { get; }
         event Action<NoteVisualType> NoteHit;
 
-        void Initialize(ICatAction action, IStateMachine<CatState> fsm, CatHitState hitState,
-            CatResultState resultState, bool left, IInputReader input, ResponsiveLayout layout);
+        void ConfigureStateMachine(IStateMachine<CatState> fsm, CatHitState hitState,
+            CatResultState resultState);
+        void Initialize(ICatAction action, bool left, IInputReader input, ResponsiveLayout layout);
         void OnNoteHit(NoteVisualType type);
         void StartPlaying();
         void StopPlaying();
