@@ -89,7 +89,7 @@ namespace Game
         {
             // Only the cat on the note's side may hit it.
             if (!_hasNote || other.gameObject.layer != _catLayer ||
-                !other.TryGetComponent<CatBehaviour>(out var cat) ||
+                !other.TryGetComponent<ICatBehaviour>(out var cat) ||
                 cat.IsLeft != (Note.Lane < 2)) return;
 
             var type = Note.VisualType;
