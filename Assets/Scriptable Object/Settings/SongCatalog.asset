@@ -19,3 +19,9 @@ MonoBehaviour:
     playOnAwake: 0
     loop: 0
     spatialBlend: 0
+  - id: baby-monster-easy
+    audio: {fileID: 8300000, guid: 94bf464c2300ed649afe23e3edc6949f, type: 3}
+    chart: {fileID: 4900000, guid: a10679ad6e5545e7918e65a60651a431, type: 3}
+    playOnAwake: 0
+    loop: 0
+    spatialBlend: 0
