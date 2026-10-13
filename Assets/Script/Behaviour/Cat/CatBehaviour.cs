@@ -60,6 +60,8 @@ namespace Game
             NoteHit?.Invoke(type);
         }
 
+        public bool CanTransition() => _fsm.CanTransition();
+
         public void StartPlaying()
         {
             _playing = true;

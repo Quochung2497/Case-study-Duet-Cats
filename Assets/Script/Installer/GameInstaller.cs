@@ -30,7 +30,8 @@ namespace Game
             }
 
             var startState = new GameStartState(_notes, _settings, _host);
-            var playingState = new GamePlayingState(_score, leftCat, rightCat, _host);
+            var playingState = new GamePlayingState(_score, leftCat, rightCat,
+                _settings.WaitForCatActionsOnWin, _host);
             var ctaState = new GameCtaState(leftCat, rightCat, _host);
             var fsm = new StateBuilder<GameState>()
                 .Add(startState)

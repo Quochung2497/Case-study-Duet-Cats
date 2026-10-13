@@ -26,6 +26,8 @@ namespace Control.Cat
 
         public override void EnterState() => PlayHit();
 
+        public override bool CanTransition() => _complete;
+
         private void PlayHit()
         {
             // The callback only reports completion; CatBehaviour chooses the next state.

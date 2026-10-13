@@ -10,6 +10,7 @@ namespace Control
     private IState<TState> _currentState;
 
     public TState CurrentStateKey => _currentState.StateKey;
+    public bool CanTransition() => _currentState.CanTransition();
 
     public StateManager(TState initialStateKey, params IState<TState>[] states)
     {
