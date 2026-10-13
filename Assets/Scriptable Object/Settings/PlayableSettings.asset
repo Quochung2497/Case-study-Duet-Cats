@@ -187,6 +187,7 @@ MonoBehaviour:
     startTransitionSeconds: 1.5
     resultSeconds: 3
     ctaReloadSeconds: 1
+    waitForCatActionsOnWin: 1
   score:
     normalPoints: 2
     strongPoints: 5

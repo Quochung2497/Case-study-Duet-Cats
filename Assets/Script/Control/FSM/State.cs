@@ -27,5 +27,6 @@ namespace Control
     public virtual void EnterState() { }
     public virtual void UpdateState(float deltaTime) { }
     public virtual void ExitState() { }
+    public virtual bool CanTransition() => true;
   }
 }

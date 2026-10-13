@@ -9,6 +9,7 @@ namespace Game
         event Action<NoteVisualType> NoteHit;
 
         void OnNoteHit(NoteVisualType type);
+        bool CanTransition();
         void ResetForRun();
         void StartPlaying();
         void StopPlaying();

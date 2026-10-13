@@ -6,6 +6,7 @@ namespace Control
   public interface IStateMachine<TState> where TState : Enum
   {
     TState CurrentStateKey { get; }
+    bool CanTransition();
     void TransitionToState(TState nextStateKey);
     void Tick(float deltaTime);
   }
