@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using Control.Game;
 using Input;
 using UnityEngine;
 using Utility;
@@ -49,6 +50,7 @@ namespace Game
         [Provide] public INoteManager ProvideNoteManager() => noteManager;
         [Provide] public IScoreManager ProvideScoreManager() => scoreManager;
         [Provide] public IGameState ProvideGameState() => gameObject.GetOrAdd<GameManager>();
+        [Provide] public IGameHost ProvideGameHost() => gameObject.GetOrAdd<GameManager>();
 
         private void Awake() => ValidateReferences();
 

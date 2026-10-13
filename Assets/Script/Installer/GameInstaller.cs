@@ -1,3 +1,5 @@
+using Control;
+using Control.Game;
 using Input;
 using UnityEngine;
 using Utility.DependencyInjection;
@@ -8,6 +10,7 @@ namespace Game
     {
         [Inject] private INoteManager _notes;
         [Inject] private IGameState _manager;
+        [Inject] private IGameHost _host;
         [Inject] private LayoutSceneRefs _sceneRefs;
         [Inject] private IInputReader _input;
         [Inject] private IGameFlowSettings _settings;
@@ -15,8 +18,8 @@ namespace Game
 
         public void AwakeInitialize()
         {
-            // Find CatBehaviour on each scene transform and wire both into GameManager.
-            if (_notes == null || _manager == null || _sceneRefs == null ||
+            // Find the scene cats before building the game FSM.
+            if (_notes == null || _manager == null || _host == null || _sceneRefs == null ||
                 _input == null || _settings == null || _score == null ||
                 _sceneRefs.LeftCat == null || _sceneRefs.RightCat == null ||
                 !_sceneRefs.LeftCat.TryGetComponent<CatBehaviour>(out var leftCat) ||
@@ -26,8 +29,18 @@ namespace Game
                 return;
             }
 
-            _manager.Initialize(_notes, leftCat, rightCat,
-                _input, _settings, _score);
+            var startState = new GameStartState(_notes, _settings, _host);
+            var playingState = new GamePlayingState(_score, leftCat, rightCat, _host);
+            var ctaState = new GameCtaState(leftCat, rightCat, _host);
+            var fsm = new StateBuilder<GameState>()
+                .Add(startState)
+                .Add(playingState)
+                .Add(new GameResultState(_notes, leftCat, rightCat, _settings, _host))
+                .Add(ctaState)
+                .Build(GameState.Start);
+
+            _manager.ConfigureStateMachine(fsm, startState, playingState, ctaState);
+            _manager.Initialize(_notes, _input, _settings);
         }
 
         public void StartInitialize() { }

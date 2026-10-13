@@ -1,4 +1,6 @@
 using System;
+using Control;
+using Control.Game;
 using Input;
 
 namespace Game
@@ -10,7 +12,8 @@ namespace Game
         event Action<GameState> StateChanged;
         event Action StartTransitionBegan;
 
-        void Initialize(INoteManager notes, ICatBehaviour leftCat, ICatBehaviour rightCat,
-            IInputReader input, IGameFlowSettings settings, IScoreManager score);
+        void ConfigureStateMachine(IStateMachine<GameState> fsm, GameStartState startState,
+            GamePlayingState playingState, GameCtaState ctaState);
+        void Initialize(INoteManager notes, IInputReader input, IGameFlowSettings settings);
     }
 }

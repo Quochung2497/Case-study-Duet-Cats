@@ -68,7 +68,8 @@ namespace Game
                 .Add(hitState)
                 .Add(resultState)
                 .Build(CatState.Idle);
-            cat.Initialize(action, fsm, hitState, resultState, left, _input, _layout);
+            cat.ConfigureStateMachine(fsm, hitState, resultState);
+            cat.Initialize(action, left, _input, _layout);
         }
     }
 }

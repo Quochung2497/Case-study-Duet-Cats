@@ -29,14 +29,18 @@ namespace Game
 
         #region Setup and gameplay
 
-        public void Initialize(ICatAction action, IStateMachine<CatState> fsm, CatHitState hitState,
-            CatResultState resultState, bool left, IInputReader input, ResponsiveLayout layout)
+        public void ConfigureStateMachine(IStateMachine<CatState> fsm, CatHitState hitState,
+            CatResultState resultState)
         {
-            // CatInstaller builds these objects; the cat stores them and subscribes to input.
-            _action = action;
             _fsm = fsm;
             _hitState = hitState;
             _resultState = resultState;
+        }
+
+        public void Initialize(ICatAction action, bool left, IInputReader input, ResponsiveLayout layout)
+        {
+            // CatInstaller supplies the action and scene input after building the FSM.
+            _action = action;
             _left = left;
             _input = input;
             _layout = layout;
