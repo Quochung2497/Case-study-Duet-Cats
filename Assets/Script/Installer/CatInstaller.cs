@@ -19,16 +19,17 @@ namespace Game
             // Build the cat FSMs only after both cat objects have the required components.
             if (_animations == null || _sceneRefs == null || _sceneRefs.LeftCat == null ||
                 _sceneRefs.RightCat == null ||
-                !_sceneRefs.LeftCat.TryGetComponent<CatBehaviour>(out var leftCat) ||
-                !_sceneRefs.RightCat.TryGetComponent<CatBehaviour>(out var rightCat))
+                !_sceneRefs.LeftCat.TryGetComponent<ICatSetup>(out var leftCat) ||
+                !_sceneRefs.RightCat.TryGetComponent<ICatSetup>(out var rightCat))
             {
                 Debug.LogError("CatInstaller needs animation settings and both cat references.", this);
                 return;
             }
 
             _layout.RecalculateLayout();
-            Build(leftCat, left: true);
-            Build(rightCat, left: false);
+            // Scene refs supply each cat Transform; Build gets its Spine and collider from that object.
+            Build(_sceneRefs.LeftCat, leftCat, left: true);
+            Build(_sceneRefs.RightCat, rightCat, left: false);
         }
 
         public void StartInitialize() { }
@@ -36,7 +37,7 @@ namespace Game
         private void Awake() => AwakeInitialize();
         private void Start() => StartInitialize();
 
-        private void Build(CatBehaviour cat, bool left)
+        private void Build(Transform cat, ICatSetup setup, bool left)
         {
             // The collider receives note triggers; SkeletonAnimation plays Spine clips.
             if (!cat.TryGetComponent<Collider2D>(out _))
@@ -68,8 +69,8 @@ namespace Game
                 .Add(hitState)
                 .Add(resultState)
                 .Build(CatState.Idle);
-            cat.ConfigureStateMachine(fsm, hitState, resultState);
-            cat.Initialize(action, left, _input, _layout);
+            setup.ConfigureStateMachine(fsm, hitState, resultState);
+            setup.Initialize(action, left, _input, _layout);
         }
     }
 }

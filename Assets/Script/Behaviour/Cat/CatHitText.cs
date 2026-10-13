@@ -22,7 +22,7 @@ namespace Game
         private void Awake()
         {
             // The world-space canvas needs a camera and font; disable label raycasts so drag still works.
-            _cat = GetComponentInParent<CatBehaviour>();
+            _cat = GetComponentInParent<ICatBehaviour>();
             if (_cat == null || _settings == null || _scene?.Camera == null ||
                 _settings.HitTextFont == null || canvas == null || label == null)
             {
