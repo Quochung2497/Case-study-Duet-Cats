@@ -9,7 +9,7 @@ using UnityEditor;
 namespace Game
 {
     [ExecuteAlways]
-    public class ResponsiveLayout : MonoBehaviour
+    public class ResponsiveLayout : MonoBehaviour, IResponsiveLayout
     {
         [SerializeField] private bool showGizmos = true;
         [Inject] private SceneVisualSettings _settings;

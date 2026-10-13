@@ -10,6 +10,7 @@ namespace Game
         AudioClip Song { get; }
         float TravelSeconds { get; }
         float HitWindowSeconds { get; }
+        string CatLayerName { get; }
         float GetNoteRadius(NoteVisualType type);
         Sprite GetNoteSprite(NoteEvent note);
     }

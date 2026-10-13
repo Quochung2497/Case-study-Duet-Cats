@@ -1,6 +1,6 @@
 namespace Control.Note
 {
-    public class NoteTimeline
+    public class NoteTimeline : INoteTimeline
     {
         // _next points to the first untaken note in the sorted chart.
         private readonly NoteEvent[] _notes;
@@ -16,6 +16,8 @@ namespace Control.Note
             _travelSeconds = travelSeconds;
         }
 
+        public void Reset() => _next = 0;
+
         public bool TryTakeDue(double songTime, out NoteEvent note)
         {
             // Take one note per call; NoteManager loops to take every note due this tick.
@@ -30,11 +32,10 @@ namespace Control.Note
             return false;
         }
 
-        public static float GetY(float spawnY, float hitY, double songTime,
-            float spawnTime, float travelSeconds)
+        public float GetY(float spawnY, float hitY, double songTime, float spawnTime)
         {
-            // Progress is 0 at spawn and 1 after travelSeconds; interpolate Y from it.
-            var progress = (songTime - spawnTime) / travelSeconds;
+            // Progress is 0 at spawn and 1 after this timeline's travel time.
+            var progress = (songTime - spawnTime) / _travelSeconds;
             return spawnY + (hitY - spawnY) * (float)progress;
         }
     }

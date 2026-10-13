@@ -13,7 +13,7 @@ namespace Game
         #region Fields and events
 
         private IInputReader _input;
-        private ResponsiveLayout _layout;
+        private IResponsiveLayout _layout;
         private ICatAction _action;
         private IStateMachine<CatState> _fsm;
         private CatHitState _hitState;
@@ -37,7 +37,7 @@ namespace Game
             _resultState = resultState;
         }
 
-        public void Initialize(ICatAction action, bool left, IInputReader input, ResponsiveLayout layout)
+        public void Initialize(ICatAction action, bool left, IInputReader input, IResponsiveLayout layout)
         {
             // CatInstaller supplies the action and scene input after building the FSM.
             _action = action;

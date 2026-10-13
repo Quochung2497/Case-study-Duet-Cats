@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using Control;
+using Control.Game;
 using Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,9 +16,8 @@ namespace Game
         Cta
     }
 
-    public class GameManager : MonoBehaviour, IGameState
+    public class GameManager : MonoBehaviour, IGameState, IGameHost
     {
-        // This state tracks the whole run, separate from each cat's animation FSM.
 #if UNITY_EDITOR
         [Header("Debug")]
         [Tooltip("Ignore all misses so the song can finish with a win in the Editor.")]
@@ -24,56 +25,41 @@ namespace Game
 #endif
 
         private INoteManager _notes;
-        private ICatBehaviour _leftCat;
-        private ICatBehaviour _rightCat;
         private IInputReader _input;
-        private IScoreManager _score;
         private IGameFlowSettings _settings;
-        private float _ctaAt;
-        private float _startAt;
-        private bool _starting;
-        private bool _reloading;
+        private IStateMachine<GameState> _fsm;
+        private GameStartState _startState;
+        private GamePlayingState _playingState;
+        private GameCtaState _ctaState;
 
-        public GameState State { get; private set; } = GameState.Start;
+        public GameState State => _fsm?.CurrentStateKey ?? GameState.Start;
         public bool Won { get; private set; }
         public event Action<GameState> StateChanged;
         public event Action StartTransitionBegan;
 
-        public void Initialize(INoteManager notes, ICatBehaviour leftCat, ICatBehaviour rightCat,
-            IInputReader input, IGameFlowSettings settings, IScoreManager score)
+        public void ConfigureStateMachine(IStateMachine<GameState> fsm, GameStartState startState,
+            GamePlayingState playingState, GameCtaState ctaState)
         {
-            // The installer supplies dependencies; this manager listens for input and note outcomes.
+            _fsm = fsm;
+            _startState = startState;
+            _playingState = playingState;
+            _ctaState = ctaState;
+        }
+
+        public void Initialize(INoteManager notes, IInputReader input, IGameFlowSettings settings)
+        {
             _notes = notes;
-            _leftCat = leftCat;
-            _rightCat = rightCat;
             _input = input;
             _settings = settings;
-            _score = score;
+
             _input.PointerDown += OnPointerDown;
             _notes.NoteMissed += OnNoteMissed;
             _notes.SongFinished += OnSongFinished;
         }
 
         private void Start() => StateChanged?.Invoke(State);
-        private void Update()
-        {
-            UpdateStart();
-            UpdateResult();
-        }
 
-        private void UpdateStart()
-        {
-            // The first tap sets a deadline; Playing begins after the transition.
-            if (!_starting || Time.unscaledTime < _startAt) return;
-            BeginPlaying();
-        }
-
-        private void UpdateResult()
-        {
-            // Keep Result visible for its configured delay before moving to CTA.
-            if (State == GameState.Result && Time.unscaledTime >= _ctaAt)
-                ShowCta();
-        }
+        private void Update() => _fsm?.Tick(Time.unscaledDeltaTime);
 
         private void OnDestroy()
         {
@@ -85,81 +71,51 @@ namespace Game
 
         private void OnPointerDown(PointerSample _)
         {
-            // The same pointer event starts a run in Start and schedules a reload in CTA.
             if (State == GameState.Start)
-                StartGame();
-            else if (State == GameState.Cta && !_reloading)
-            {
-                _reloading = true;
-                StartCoroutine(ReloadSceneAfterDelay());
-            }
+                _startState.OnPointerDown();
+            else if (State == GameState.Cta)
+                _ctaState.OnPointerDown();
         }
+
+        private void OnNoteMissed()
+        {
+#if UNITY_EDITOR
+            if (ignoreMisses) return;
+#endif
+            if (State == GameState.Playing) _playingState.OnNoteMissed();
+        }
+
+        private void OnSongFinished()
+        {
+            if (State == GameState.Playing) _playingState.OnSongFinished();
+        }
+
+        void IGameHost.TransitionTo(GameState nextState) => ChangeState(nextState);
+
+        private void ChangeState(GameState nextState)
+        {
+            if (State == nextState) return;
+            _fsm.TransitionToState(nextState);
+            StateChanged?.Invoke(State);
+        }
+
+        void IGameHost.FinishRun(bool won)
+        {
+            if (State != GameState.Playing) return;
+            Won = won;
+            ChangeState(GameState.Result);
+        }
+
+        void IGameHost.BeginStartTransition() => StartTransitionBegan?.Invoke();
+
+        void IGameHost.RefreshCurrentState() => StateChanged?.Invoke(State);
+
+        void IGameHost.ScheduleReload() => StartCoroutine(ReloadSceneAfterDelay());
 
         private IEnumerator ReloadSceneAfterDelay()
         {
             yield return new WaitForSecondsRealtime(_settings.CtaReloadSeconds);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-
-        private void OnNoteMissed()
-        {
-            // The Editor-only debug flag ignores misses so the whole song can play.
-#if UNITY_EDITOR
-            if (ignoreMisses) return;
-#endif
-            EndGame(false);
-        }
-        private void OnSongFinished() => EndGame(true);
-
-        private void StartGame()
-        {
-            // _starting prevents repeated taps from starting multiple transitions.
-            if (State != GameState.Start || _starting) return;
-            _starting = true;
-            _startAt = Time.unscaledTime + _settings.StartTransitionSeconds;
-            StartTransitionBegan?.Invoke();
-        }
-
-        private void BeginPlaying()
-        {
-            _starting = false;
-            // Change state and reset score only after the song is scheduled successfully.
-            if (!_notes.StartSong())
-            {
-                StateChanged?.Invoke(State);
-                return;
-            }
-
-            _score.ResetScore();
-            State = GameState.Playing;
-            _leftCat.StartPlaying();
-            _rightCat.StartPlaying();
-            StateChanged?.Invoke(State);
-        }
-
-        private void EndGame(bool won)
-        {
-            // A run has one result; later misses or song completion are ignored.
-            if (State != GameState.Playing) return;
-
-            Won = won;
-            State = GameState.Result;
-            _ctaAt = Time.unscaledTime + _settings.ResultSeconds;
-            _notes.StopSong();
-            _leftCat.ShowResult(won);
-            _rightCat.ShowResult(won);
-            StateChanged?.Invoke(State);
-        }
-
-        private void ShowCta()
-        {
-            // Hide both cats before notifying the UI that CTA has begun.
-            if (State != GameState.Result) return;
-
-            State = GameState.Cta;
-            _leftCat.SetVisible(false);
-            _rightCat.SetVisible(false);
-            StateChanged?.Invoke(State);
         }
     }
 }

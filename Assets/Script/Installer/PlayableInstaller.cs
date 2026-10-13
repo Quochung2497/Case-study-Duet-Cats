@@ -45,9 +45,10 @@ namespace Game
         [Provide] public LayoutSceneRefs ProvideSceneRefs() => SceneRefs;
         [Provide] public IInputReader ProvideInputReader() => inputReader;
         [Provide] public NoteBehaviour ProvideNotePrefab() => notePrefab;
-        [Provide] public ResponsiveLayout ProvideLayout() => responsiveLayout;
+        [Provide] public IResponsiveLayout ProvideLayout() => responsiveLayout;
         [Provide] public IViewport ProvideViewport() => viewportController;
         [Provide] public INoteManager ProvideNoteManager() => noteManager;
+        [Provide] public Transform ProvideNoteParent() => noteManager.transform;
         [Provide] public IScoreManager ProvideScoreManager() => scoreManager;
         [Provide] public IGameState ProvideGameState() => gameObject.GetOrAdd<GameManager>();
         [Provide] public IGameHost ProvideGameHost() => gameObject.GetOrAdd<GameManager>();

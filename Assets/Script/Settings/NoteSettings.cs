@@ -13,6 +13,9 @@ namespace Game
         [Min(0.01f)] [SerializeField] private float travelSeconds = 1.4f;
         [Min(0f)] [SerializeField] private float hitWindowSeconds = 0.2f;
 
+        [Header("Collision")]
+        [SerializeField] private string catLayerName = "Cat";
+
         [Header("Note collider radii")]
         [Range(0.34f, 0.49f)] [SerializeField] private float normalNoteRadius = 0.34f;
         [Range(0.34f, 0.49f)] [SerializeField] private float strongNoteRadius = 0.49f;
@@ -32,6 +35,7 @@ namespace Game
         public AudioClip Song => song;
         public float TravelSeconds => travelSeconds;
         public float HitWindowSeconds => hitWindowSeconds;
+        public string CatLayerName => catLayerName;
 
         public float GetNoteRadius(NoteVisualType type)
         {

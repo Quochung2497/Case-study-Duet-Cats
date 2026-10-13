@@ -5,7 +5,7 @@ using Utility;
 
 namespace Game
 {
-    public class NoteBehaviour : MonoBehaviour, IPoolObject<NoteBehaviour>
+    public class NoteBehaviour : MonoBehaviour, INoteBehaviour, IPoolObject<NoteBehaviour>
     {
         private int _catLayer;
         private IScoreManager _score;
@@ -23,8 +23,6 @@ namespace Game
 
         private void Awake()
         {
-            // Resolve the layer in Awake, after Unity allows its API to be called.
-            _catLayer = LayerMask.NameToLayer("Cat");
             CacheComponents();
         }
 
@@ -38,10 +36,11 @@ namespace Game
 
         public void SetPool(IObjectPool<NoteBehaviour> pool) => _pool = pool;
 
-        public void Initialize(IObjectPool<NoteBehaviour> pool, IScoreManager score)
+        public void Initialize(IObjectPool<NoteBehaviour> pool, IScoreManager score, string catLayerName)
         {
             SetPool(pool);
             _score = score;
+            _catLayer = LayerMask.NameToLayer(catLayerName);
         }
 
         public void ResetForReuse()
@@ -64,15 +63,13 @@ namespace Game
             if (_collider != null) _collider.radius = radius;
         }
 
-        public void Place(double songTime, LayoutData layout,
-            float travelSeconds)
+        public void Place(double songTime, LayoutData layout, INoteTimeline timeline)
         {
             if (!_hasNote || _rb == null) return;
 
             var pos = new Vector2(
                 layout.LaneX(Note.Lane),
-                NoteTimeline.GetY(layout.SpawnY, layout.HitY, songTime,
-                    Note.SpawnTime, travelSeconds));
+                timeline.GetY(layout.SpawnY, layout.HitY, songTime, Note.SpawnTime));
 
             // Set the initial position directly; use Rigidbody2D.MovePosition on later ticks.
             if (!_placed)

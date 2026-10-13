@@ -10,7 +10,7 @@ namespace Game
     public sealed class CatInstaller : MonoBehaviour, IInstaller
     {
         [Inject] private IInputReader _input;
-        [Inject] private ResponsiveLayout _layout;
+        [Inject] private IResponsiveLayout _layout;
         [Inject] private LayoutSceneRefs _sceneRefs;
         [Inject] private CatAnimationSet _animations;
 

@@ -111,6 +111,7 @@ MonoBehaviour:
     song: {fileID: 8300000, guid: 94bf464c2300ed649afe23e3edc6949f, type: 3}
     travelSeconds: 1.2
     hitWindowSeconds: 0.2
+    catLayerName: Cat
     normalNoteRadius: 0.34
     strongNoteRadius: 0.49
     longNoteRadius: 0.42
