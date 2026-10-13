@@ -9,12 +9,11 @@ namespace Game
     [DisallowMultipleComponent]
     public class NoteManager : MonoBehaviour, INoteManager
     {
-        private readonly List<NoteBehaviour> _active = new();
-        private NoteEvent[] _chart;
-        private NoteTimeline _timeline;
-        private NotePool _pool;
+        private readonly List<INoteBehaviour> _active = new();
+        private INoteTimeline _timeline;
+        private INotePool _pool;
         private INoteSettings _settings;
-        private ResponsiveLayout _layout;
+        private IResponsiveLayout _layout;
         private AudioSource _music;
         private double _songStartDsp;
         private bool _playing;
@@ -22,12 +21,12 @@ namespace Game
         public event Action NoteMissed;
         public event Action SongFinished;
 
-        public void Initialize(NoteEvent[] chart, NoteBehaviour prefab,
-            INoteSettings settings, ResponsiveLayout layout, IScoreManager score)
+        public void Initialize(INoteTimeline timeline, INotePool pool,
+            INoteSettings settings, IResponsiveLayout layout)
         {
-            // The installer provides dependencies once; the pool creates notes when needed.
-            _chart = chart;
-            _pool = new NotePool(prefab, transform, score);
+            // The installer creates the pool and provides it with the other playback dependencies.
+            _timeline = timeline;
+            _pool = pool;
             _settings = settings;
             _layout = layout;
             _music = gameObject.GetOrAdd<AudioSource>();
@@ -35,12 +34,13 @@ namespace Game
 
         public bool StartSong()
         {
-            if (_chart == null || _settings == null || _settings.Song == null || _music == null)
+            if (_timeline == null || _pool == null || _settings == null ||
+                _settings.Song == null || _music == null)
                 return false;
 
             StopSong();
-            // Create a fresh timeline for each run so its note cursor starts at zero.
-            _timeline = new NoteTimeline(_chart, _settings.TravelSeconds);
+            // Replay the same chart from its first note on each run.
+            _timeline.Reset();
             _music.clip = _settings.Song;
             _music.playOnAwake = false;
             _music.loop = false;
@@ -58,11 +58,9 @@ namespace Game
             _playing = false;
             if (_music != null) _music.Stop();
             foreach (var note in _active)
-                if (note.HasNote) note.Release();
+                if (note.HasNote) _pool.Release(note);
             _active.Clear();
         }
-
-        private void OnDestroy() => _pool?.GetPool().Clear();
 
         private void FixedUpdate() => UpdateNotes();
 
@@ -80,10 +78,10 @@ namespace Game
             // Take every note due to spawn, including several in the same tick.
             while (_timeline.TryTakeDue(songTime, out var noteEvent))
             {
-                var note = _pool.GetPool().Get();
+                var note = _pool.Get();
                 note.SetNote(noteEvent, _settings.GetNoteSprite(noteEvent),
                     _settings.GetNoteRadius(noteEvent.VisualType));
-                note.Place(songTime, _layout.Current, _timeline.TravelSeconds);
+                note.Place(songTime, _layout.Current, _timeline);
                 _active.Add(note);
             }
 
@@ -97,12 +95,12 @@ namespace Game
                     continue;
                 }
 
-                note.Place(songTime, _layout.Current, _timeline.TravelSeconds);
+                note.Place(songTime, _layout.Current, _timeline);
                 // Count a miss when the note passes arrival time plus the hit window.
                 if (songTime <= note.Note.SpawnTime + _timeline.TravelSeconds + _settings.HitWindowSeconds)
                     continue;
 
-                note.Release();
+                _pool.Release(note);
                 _active.RemoveAt(i);
                 NoteMissed?.Invoke();
                 return;

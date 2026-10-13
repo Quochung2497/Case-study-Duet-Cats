@@ -13,7 +13,7 @@ namespace Game
 
         void ConfigureStateMachine(IStateMachine<CatState> fsm, CatHitState hitState,
             CatResultState resultState);
-        void Initialize(ICatAction action, bool left, IInputReader input, ResponsiveLayout layout);
+        void Initialize(ICatAction action, bool left, IInputReader input, IResponsiveLayout layout);
         void OnNoteHit(NoteVisualType type);
         void StartPlaying();
         void StopPlaying();

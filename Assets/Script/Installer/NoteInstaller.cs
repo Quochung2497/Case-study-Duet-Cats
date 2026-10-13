@@ -10,17 +10,22 @@ namespace Game
         [Inject] private NoteBehaviour _notePrefab;
         [Inject] private INoteManager _manager;
         [Inject] private INoteSettings _settings;
-        [Inject] private ResponsiveLayout _layout;
+        [Inject] private IResponsiveLayout _layout;
         [Inject] private IScoreManager _score;
+        [Inject] private Transform _noteParent;
+        private NotePool _pool;
 
         public void AwakeInitialize()
         {
             // Validate song, chart, and timing before building the note system.
-            if (_notePrefab == null || _manager == null || _settings == null || _layout == null || _score == null ||
+            if (_noteParent == null || _notePrefab == null || _manager == null ||
+                _settings == null || _layout == null || _score == null ||
                 _settings.Chart == null || _settings.Song == null ||
-                _settings.TravelSeconds <= 0f || _settings.HitWindowSeconds < 0f)
+                _settings.TravelSeconds <= 0f || _settings.HitWindowSeconds < 0f ||
+                string.IsNullOrWhiteSpace(_settings.CatLayerName) ||
+                LayerMask.NameToLayer(_settings.CatLayerName) < 0)
             {
-                Debug.LogError("NoteInstaller needs a note manager, prefab, chart, song and valid timing settings.", this);
+                Debug.LogError("NoteInstaller needs a note parent, manager, prefab, chart, song, valid timing and a cat layer.", this);
                 return;
             }
 
@@ -35,10 +40,12 @@ namespace Game
 
             try
             {
-                // Parse once during setup and pass the sorted NoteEvent array to the manager.
+                // Parse once and build the timeline before wiring the manager.
                 var chart = NoteChart.Parse(_settings.Chart.text);
+                INoteTimeline timeline = new NoteTimeline(chart, _settings.TravelSeconds);
                 _layout.RecalculateLayout();
-                _manager.Initialize(chart, _notePrefab, _settings, _layout, _score);
+                _pool = new NotePool(_notePrefab, _noteParent, _score, _settings.CatLayerName);
+                _manager.Initialize(timeline, _pool, _settings, _layout);
             }
             catch (FormatException ex)
             {
@@ -50,5 +57,6 @@ namespace Game
 
         private void Awake() => AwakeInitialize();
         private void Start() => StartInitialize();
+        private void OnDestroy() => _pool?.GetPool().Clear();
     }
 }
