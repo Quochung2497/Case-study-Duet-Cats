@@ -37,6 +37,8 @@ namespace Game
             // Ignore a completion callback after another animation replaces this one.
             var version = ++_animVersion;
             var entry = _spine.AnimationState.SetAnimation(0, selection.Name, selection.Loop);
+            // The destination cue controls how quickly its pose blends in.
+            entry.MixDuration = selection.MixDuration;
             if (onComplete != null)
                 entry.Complete += _ =>
                 {

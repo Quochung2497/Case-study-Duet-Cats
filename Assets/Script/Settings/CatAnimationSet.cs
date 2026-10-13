@@ -20,10 +20,12 @@ namespace Game
     {
         [SerializeField] private CatAnimationCue cue;
         [SerializeField] private bool loop;
+        [Min(0f)] [SerializeField] private float mixDuration = 0.2f;
         [SerializeField] private string[] clips;
 
         public CatAnimationCue Cue => cue;
         public bool Loop => loop;
+        public float MixDuration => mixDuration;
         public string[] Clips => clips;
     }
 
@@ -32,12 +34,14 @@ namespace Game
         public readonly string Name;
         public readonly bool Loop;
         public readonly int Index;
+        public readonly float MixDuration;
 
-        public CatAnimationSelection(string name, bool loop, int index)
+        public CatAnimationSelection(string name, bool loop, int index, float mixDuration)
         {
             Name = name;
             Loop = loop;
             Index = index;
+            MixDuration = mixDuration;
         }
     }
 
@@ -59,7 +63,7 @@ namespace Game
                     var index = UnityEngine.Random.Range(0, clips.Length);
                     if (clips.Length > 1 && index == previousIndex)
                         index = (index + 1) % clips.Length;
-                    return new CatAnimationSelection(clips[index], group.Loop, index);
+                    return new CatAnimationSelection(clips[index], group.Loop, index, group.MixDuration);
                 }
 
             throw new InvalidOperationException($"{name} has no clips for {cue}.");
