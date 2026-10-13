@@ -9,7 +9,7 @@ namespace Game
         event Action SongFinished;
 
         void Initialize(INoteTimeline timeline, INotePool pool,
-            INoteSettings settings, IResponsiveLayout layout);
+            ISongPlaybackSettings song, INoteSettings settings, IResponsiveLayout layout);
         bool StartSong();
         void StopSong();
     }

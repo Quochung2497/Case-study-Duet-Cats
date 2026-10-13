@@ -22,7 +22,7 @@ namespace Game
         public event Action SongFinished;
 
         public void Initialize(INoteTimeline timeline, INotePool pool,
-            INoteSettings settings, IResponsiveLayout layout)
+            ISongPlaybackSettings song, INoteSettings settings, IResponsiveLayout layout)
         {
             // The installer creates the pool and provides it with the other playback dependencies.
             _timeline = timeline;
@@ -30,21 +30,21 @@ namespace Game
             _settings = settings;
             _layout = layout;
             _music = gameObject.GetOrAdd<AudioSource>();
+            _music.playOnAwake = song.PlayOnAwake;
+            _music.loop = song.Loop;
+            _music.spatialBlend = song.SpatialBlend;
+            _music.clip = song.Audio;
         }
 
         public bool StartSong()
         {
             if (_timeline == null || _pool == null || _settings == null ||
-                _settings.Song == null || _music == null)
+                _music == null || _music.clip == null)
                 return false;
 
             StopSong();
             // Replay the same chart from its first note on each run.
             _timeline.Reset();
-            _music.clip = _settings.Song;
-            _music.playOnAwake = false;
-            _music.loop = false;
-            _music.spatialBlend = 0f;
             _songStartDsp = AudioSettings.dspTime + 0.1d;
             // Use the DSP clock for both audio and note positions to avoid frame-rate drift.
             _music.PlayScheduled(_songStartDsp);

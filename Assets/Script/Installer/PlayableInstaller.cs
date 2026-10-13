@@ -10,12 +10,26 @@ namespace Game
 {
     public sealed class PlayableInstaller : MonoBehaviour, IDependencyProvider
     {
+        [System.Serializable]
+        private struct SongChoice
+        {
+            [Tooltip("Synced from SongCatalog. Edit song IDs in the asset.")]
+            public string id;
+            [Tooltip("Select exactly one song choice before playing or building.")]
+            public bool selected;
+        }
+
         // Keep Inspector references in one place instead of duplicating them in each installer.
         [Header("Scriptable Objects")]
         [SerializeField] private PlayableSettings settings;
         [SerializeField] private CatAnimationSet catAnimations;
         [SerializeField] private CtaAnimationSet ctaAnimations;
         [SerializeField] private InputReader inputReader;
+
+        [Header("Song configuration")]
+        [SerializeField] private SongCatalog songCatalog;
+        [Header("Song choices - select exactly one")]
+        [SerializeField] private List<SongChoice> songChoices = new();
 
         [Header("Prefabs")]
         [SerializeField] private NoteBehaviour notePrefab;
@@ -38,6 +52,16 @@ namespace Game
         [Provide] public CatAnimationSet ProvideCatAnimationSet() => catAnimations;
         [Provide] public CtaAnimationSet ProvideCtaAnimationSet() => ctaAnimations;
         [Provide] public INoteSettings ProvideNoteSettings() => settings.Notes;
+        [Provide]
+        public SongDefinition ProvideSelectedSong()
+        {
+            // Scene choices select one entry without storing its audio/chart in the scene.
+            var selected = songChoices.FindAll(choice => choice.selected);
+            if (selected.Count != 1)
+                throw new System.InvalidOperationException("Tick Selected on exactly one song choice in PlayableInstaller.");
+
+            return songCatalog.Get(selected[0].id);
+        }
         [Provide] public HitVfxSettings ProvideHitVfxSettings() => settings.HitVfx;
         [Provide] public HitTextSettings ProvideHitTextSettings() => settings.HitText;
         [Provide] public IGameFlowSettings ProvideGameFlowSettings() => settings.GameFlow;
@@ -56,7 +80,33 @@ namespace Game
         private void Awake() => ValidateReferences();
 
 #if UNITY_EDITOR
-        private void OnValidate() => ValidateReferences();
+        private void OnValidate()
+        {
+            SyncSongChoices();
+            ValidateReferences();
+        }
+
+        [ContextMenu("Refresh Song Choices")]
+        private void RefreshSongChoices()
+        {
+            UnityEditor.Undo.RecordObject(this, "Refresh Song Choices");
+            SyncSongChoices();
+            UnityEditor.PrefabUtility.RecordPrefabInstancePropertyModifications(this);
+        }
+
+        private void SyncSongChoices()
+        {
+            var choices = new List<SongChoice>();
+            if (songCatalog != null)
+                foreach (var song in songCatalog.Songs)
+                {
+                    // Match by ID so reordering or adding catalog entries preserves the scene choice.
+                    var previous = songChoices.Find(choice => choice.id == song.Id);
+                    choices.Add(new SongChoice { id = song.Id, selected = previous.selected });
+                }
+
+            songChoices = choices;
+        }
 #endif
 
         private void ValidateReferences()

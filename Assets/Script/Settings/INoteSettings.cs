@@ -3,11 +3,9 @@ using UnityEngine;
 
 namespace Game
 {
-    // Note setup and playback depend only on these chart, timing, and presentation rules.
+    // Song selection is separate from these note timing and presentation rules.
     public interface INoteSettings
     {
-        TextAsset Chart { get; }
-        AudioClip Song { get; }
         float TravelSeconds { get; }
         float HitWindowSeconds { get; }
         string CatLayerName { get; }

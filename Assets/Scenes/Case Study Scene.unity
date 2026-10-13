@@ -2923,6 +2923,10 @@ MonoBehaviour:
   catAnimations: {fileID: 11400000, guid: 869b45ce46b446fcbac6e825aeefde79, type: 2}
   ctaAnimations: {fileID: 11400000, guid: 3e0c3daa75524e8ba2fa8b0c408ae100, type: 2}
   inputReader: {fileID: 11400000, guid: 09c609e20f1986743b217b65892bd88a, type: 2}
+  songCatalog: {fileID: 11400000, guid: 76c88624e29264d58f4d6e5f81dbbb5f, type: 2}
+  songChoices:
+  - id: baby-monster-full
+    selected: 1
   notePrefab: {fileID: 3458910673849965325, guid: 8a904f9413292f04e82f1c656eadf4df, type: 3}
   gameplayCamera: {fileID: 519420031}
   leftCat: {fileID: 923182326}

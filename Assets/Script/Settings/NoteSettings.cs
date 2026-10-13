@@ -7,9 +7,7 @@ namespace Game
     [Serializable]
     public class NoteSettings : INoteSettings
     {
-        [Header("Song and chart")]
-        [SerializeField] private TextAsset chart;
-        [SerializeField] private AudioClip song;
+        [Header("Note timing")]
         [Min(0.01f)] [SerializeField] private float travelSeconds = 1.4f;
         [Min(0f)] [SerializeField] private float hitWindowSeconds = 0.2f;
 
@@ -31,8 +29,6 @@ namespace Game
         [SerializeField] private Sprite rightLong;
         [SerializeField] private Sprite lolipopLong;
 
-        public TextAsset Chart => chart;
-        public AudioClip Song => song;
         public float TravelSeconds => travelSeconds;
         public float HitWindowSeconds => hitWindowSeconds;
         public string CatLayerName => catLayerName;
