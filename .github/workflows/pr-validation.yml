@@ -139,6 +139,8 @@ jobs:
         with:
           unity-version: 6000.3.22f1
           build-targets: WebGL
+          # Pin Hub below 3.20: this action expects the legacy /opt/unityhub installation path.
+          hub-version: '3.19.5'
           cache-installation: true
 
       # Activate Personal through the licensing client using Unity account secrets.
