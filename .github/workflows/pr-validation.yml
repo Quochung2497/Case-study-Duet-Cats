@@ -95,15 +95,29 @@ jobs:
       # Restore dependencies kept outside Git, preserving their Assets paths and original .meta files.
       - name: Download external Spine and TMP dependencies
         env:
-          # Store the direct HTTPS download URL as a secret and the expected ZIP hash as a variable.
+          # Use a GitHub Contents API URL for the ZIP in the separate private dependency repository.
           CI_DEPENDENCIES_URL: ${{ secrets.CI_DEPENDENCIES_URL }}
+          # This token only needs Contents: Read access to that dependency repository.
+          CI_DEPENDENCIES_TOKEN: ${{ secrets.CI_DEPENDENCIES_TOKEN }}
           CI_DEPENDENCIES_SHA256: ${{ vars.CI_DEPENDENCIES_SHA256 }}
         run: |
-          # Stop immediately if either dependency setting has not been configured.
-          test -n "$CI_DEPENDENCIES_URL"
-          test -n "$CI_DEPENDENCIES_SHA256"
-          # Download via HTTPS, including redirects, and fail on HTTP errors.
-          curl --fail --location --silent --show-error --proto '=https' --proto-redir '=https' "$CI_DEPENDENCIES_URL" -o "$RUNNER_TEMP/dependencies.zip"
+          # Report the missing setting by name instead of failing with an unexplained exit code.
+          for setting in CI_DEPENDENCIES_URL CI_DEPENDENCIES_TOKEN CI_DEPENDENCIES_SHA256; do
+            if [ -z "${!setting}" ]; then
+              echo "::error::Configure $setting in Settings > Secrets and variables > Actions."
+              exit 1
+            fi
+          done
+          # Only send the dependency token to GitHub's Contents API.
+          case "$CI_DEPENDENCIES_URL" in
+            https://api.github.com/repos/*/contents/*) ;;
+            *) echo "::error::CI_DEPENDENCIES_URL must be a GitHub Contents API URL."; exit 1 ;;
+          esac
+          # Request raw ZIP bytes, authenticate the private repository and fail on HTTP errors.
+          curl --fail --location --silent --show-error --proto '=https' --proto-redir '=https' \
+            --header "Authorization: Bearer $CI_DEPENDENCIES_TOKEN" \
+            --header "Accept: application/vnd.github.raw+json" \
+            "$CI_DEPENDENCIES_URL" -o "$RUNNER_TEMP/dependencies.zip"
           # Verify the exact archive bytes before extracting them into the Unity project.
           printf '%s  %s\n' "$CI_DEPENDENCIES_SHA256" "$RUNNER_TEMP/dependencies.zip" | sha256sum --check -
           unzip -q "$RUNNER_TEMP/dependencies.zip" -d "$GITHUB_WORKSPACE"
