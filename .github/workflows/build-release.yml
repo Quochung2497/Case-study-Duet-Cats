@@ -78,12 +78,17 @@ jobs:
           fi
 
       # Upload only the generated site, without source code or the old committed WebBuild.
+      # Use a unique name per run attempt so reruns do not collide with earlier Pages artifacts.
       - name: Upload GitHub Pages site
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: site
 
       # Replace the live site after the build and release upload have succeeded.
+      # Select only the Pages artifact uploaded by this run attempt.
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
