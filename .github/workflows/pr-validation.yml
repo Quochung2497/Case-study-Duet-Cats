@@ -6,6 +6,13 @@ on:
     branches: [Main]
   # Allow a manual run from the Actions tab once this workflow exists on the default branch.
   workflow_dispatch:
+  # Reuse the same checks and Unity build when the tag release workflow calls this file.
+  workflow_call:
+    inputs:
+      upload-build:
+        description: Upload the verified WebGL build for the release and deployment job.
+        type: boolean
+        default: false
 
 # These checks only need to read the repository; they do not publish or modify it.
 permissions:
@@ -164,6 +171,22 @@ jobs:
             -customBuildPath "$GITHUB_WORKSPACE/build/WebGL" \
             -logFile -
 
-      # Confirm that a non-empty WebGL entry page was produced; no artifact upload or deployment is needed.
+      # Confirm that the entry page and all three Brotli/fallback payloads were produced.
       - name: Verify build output
-        run: test -n "$(find build -type f -name index.html -size +0c -print -quit)"
+        run: |
+          test -s build/WebGL/index.html
+          for payload in data framework.js wasm; do
+            test -n "$(find build/WebGL/Build -type f -name "*.$payload.unityweb" -size +0c -print -quit)"
+          done
+
+      # Only a caller requesting release output stores an artifact; ordinary PR checks stop above.
+      - name: Upload verified WebGL build
+        if: inputs.upload-build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: webgl-build
+          path: build/WebGL
+          if-no-files-found: error
+          retention-days: 7
+          # Unity has already compressed the large payloads with Brotli.
+          compression-level: 0

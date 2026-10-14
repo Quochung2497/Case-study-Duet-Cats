@@ -1,0 +1,89 @@
+name: Build and Release
+
+on:
+  # Build the exact tagged commit, regardless of the branch on which the tag was created.
+  push:
+    tags: ['build-v*']
+
+# The build reads the repository; only the publishing job receives write permissions.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build WebGL
+    # Reuse dependency restoration, repository checks, Unity activation and the verified build.
+    uses: ./.github/workflows/pr-validation.yml
+    with:
+      upload-build: true
+    secrets: inherit
+
+  publish:
+    name: Publish Release and Pages
+    needs: build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.base_url }}/WebBuild/
+    # Serialize publishing so two builds cannot update the live site at the same time.
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      # Restore the successful build under WebBuild to preserve the existing public URL.
+      - name: Download verified WebGL build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: webgl-build
+          path: site/WebBuild
+
+      # Read the existing Pages configuration; Settings > Pages must use GitHub Actions.
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      # Put index.html at the ZIP root and make the site's root redirect to WebBuild.
+      - name: Package WebGL release
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          zip_path="$RUNNER_TEMP/DuetCats-${RELEASE_TAG}-WebGL.zip"
+          cd site/WebBuild
+          zip -q -r "$zip_path" .
+          cd ..
+          cat > index.html <<'HTML'
+          <!doctype html>
+          <html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=WebBuild/"><title>Duet Cats</title></head>
+          <body><a href="WebBuild/">Play Duet Cats</a></body></html>
+          HTML
+
+      # Create a release for the existing tag; rerunning the same tag replaces its build ZIP.
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          zip_path="$RUNNER_TEMP/DuetCats-${RELEASE_TAG}-WebGL.zip"
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$zip_path" --clobber
+          else
+            gh release create "$RELEASE_TAG" "$zip_path" \
+              --verify-tag --title "$RELEASE_TAG" --generate-notes
+          fi
+
+      # Upload only the generated site, without source code or the old committed WebBuild.
+      - name: Upload GitHub Pages site
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: site
+
+      # Replace the live site after the build and release upload have succeeded.
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

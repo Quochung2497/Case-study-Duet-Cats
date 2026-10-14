@@ -23,6 +23,10 @@ namespace Game.Editor
                 if (pathIndex < 0 || pathIndex + 1 >= arguments.Length)
                     throw new InvalidOperationException("CI requires -customBuildPath.");
 
+                // Compress release payloads and include a JavaScript decompressor for static hosting.
+                PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Brotli;
+                PlayerSettings.WebGL.decompressionFallback = true;
+
                 var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
                 {
                     scenes = scenes,
