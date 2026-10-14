@@ -47,3 +47,9 @@ Personal constraints left only 1–2 days to build this playable, so I prioritiz
 - **Variants:** One song/chart, a one-miss loss, and total score keep the run short. Chart variants, song start/end points, and session duration could enable A/B tests on the same game loop.
 - **CTA:** Song cards are visual only; a production build should open their destinations instead of reloading on tap.
 - **Landscape UI:** Gameplay adapts, but UI was tuned mainly for portrait. Landscape-specific `RectTransform` position, size, and rotation rules would improve it across screen ratios.
+
+## 5. CI/CD
+
+- **Commit check:** A local Git hook enforces `type: description` subjects on any branch.
+- **PR check:** PRs into `Main` check conflict markers, `.meta`, GUIDs and JSON, then compile/build with Unity `6000.3.22f1`.
+- **Build & release:** Push `build-v*` tags to build WebGL with Brotli + fallback, publish a ZIP release and deploy GitHub Pages.
