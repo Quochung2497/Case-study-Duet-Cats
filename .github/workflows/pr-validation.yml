@@ -19,8 +19,8 @@ concurrency:
 jobs:
   validate:
     name: PR Validation
-    # Use a GitHub-hosted Linux runner and stop the job if it exceeds one hour.
-    runs-on: ubuntu-latest
+    # Use a fixed GitHub-hosted Linux image for the native Unity installation.
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
       # For a PR, check out GitHub's proposed merge commit so the checks cover its result on Main.
@@ -133,24 +133,34 @@ jobs:
           restore-keys: |
             Library-6000.3.22f1-WebGL-${{ vars.CI_DEPENDENCIES_SHA256 }}-
 
-      # Use the required Unity version to import the project, compile scripts and build enabled scenes.
-      # Compiler/build errors fail the job; this step does not run a gameplay round.
-      - name: Import, compile and build WebGL
-        uses: game-ci/unity-builder@4423ee75828dff56037d1d1cfdac6b68e3a6ba00 # v4
-        env:
-          # GameCI uses these repository secrets to activate Unity on the temporary runner.
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      # Install the required editor and WebGL module directly on the runner; reuse the installation cache.
+      - name: Install Unity 6000.3.22f1 and WebGL support
+        uses: buildalon/unity-setup@30fcbcb56c10ea5d64298e970d952b8d29bc268b # v2
         with:
-          unityVersion: 6000.3.22f1
-          targetPlatform: WebGL
-          buildsPath: build
-          # Keep the project's version unchanged; the editor entry point chooses scenes and reports failure.
-          versioning: None
-          buildMethod: Game.Editor.CiBuild.BuildWebGL
-          # CiBuild explicitly exits the editor with code 0 on success or 1 on failure.
-          manualExit: true
+          unity-version: 6000.3.22f1
+          build-targets: WebGL
+          cache-installation: true
+
+      # Activate Personal through the licensing client using Unity account secrets.
+      # The action runs license cleanup in its post step after the job finishes.
+      - name: Activate Unity Personal license
+        uses: buildalon/activate-unity-license@e0d245d0787b7b9931b56ccbde3b508f6b70f1af # v2
+        with:
+          license: personal
+          username: ${{ secrets.UNITY_EMAIL }}
+          password: ${{ secrets.UNITY_PASSWORD }}
+
+      # Import and compile in batch mode, then build enabled scenes using the existing editor entry point.
+      # CiBuild exits with code 0 on success or 1 on failure; the project version stays unchanged.
+      - name: Import, compile and build WebGL
+        run: |
+          xvfb-run --auto-servernum "$UNITY_EDITOR_PATH" \
+            -batchmode -nographics \
+            -projectPath "$GITHUB_WORKSPACE" \
+            -buildTarget WebGL \
+            -executeMethod Game.Editor.CiBuild.BuildWebGL \
+            -customBuildPath "$GITHUB_WORKSPACE/build/WebGL" \
+            -logFile -
 
       # Confirm that a non-empty WebGL entry page was produced; no artifact upload or deployment is needed.
       - name: Verify build output
