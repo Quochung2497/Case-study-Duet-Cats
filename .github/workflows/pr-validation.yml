@@ -1,0 +1,192 @@
+name: PR Validation
+
+on:
+  # Validate PRs whose destination branch is Main, including new commits added to an open PR.
+  pull_request:
+    branches: [Main]
+  # Allow a manual run from the Actions tab once this workflow exists on the default branch.
+  workflow_dispatch:
+  # Reuse the same checks and Unity build when the tag release workflow calls this file.
+  workflow_call:
+    inputs:
+      upload-build:
+        description: Upload the verified WebGL build for the release and deployment job.
+        type: boolean
+        default: false
+
+# These checks only need to read the repository; they do not publish or modify it.
+permissions:
+  contents: read
+
+# Keep the latest run for each PR (or branch for manual runs) and cancel an older unfinished run.
+concurrency:
+  group: pr-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: PR Validation
+    # Use a fixed GitHub-hosted Linux image for the native Unity installation.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      # For a PR, check out GitHub's proposed merge commit so the checks cover its result on Main.
+      # Fetch the full history; each external action is pinned to an exact commit.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      # Fail on repository data errors before downloading dependencies or starting Unity.
+      - name: Check conflict markers, metadata, GUIDs and JSON
+        run: |
+          python3 - <<'PY'
+          import json
+          import re
+          import subprocess
+          from pathlib import Path, PurePosixPath
+
+          # Python accepts NaN/Infinity by default; reject them because they are not valid JSON.
+          def invalid_constant(value):
+              raise ValueError(f'Invalid JSON constant: {value}')
+
+          # Validate the full tracked checkout; ignored Spine/TMP files are restored in the next step.
+          files = set(subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')) - {''}
+          # Match unresolved Git conflict markers, including diff3 base markers and longer markers.
+          markers = re.compile(r'^(?:<{7,}(?:\s.*)?|={7,}|>{7,}(?:\s.*)?|\|{7,}(?:\s.*)?)$')
+          # Collect all errors, record the owner of each GUID and track asset folder ancestors.
+          errors, guids, folders = [], {}, set()
+          for name in sorted(files):
+              data, text = Path(name).read_bytes(), ''
+              # Scan readable UTF-8 text (with or without a BOM); skip binary/non-UTF-8 marker scans.
+              if b'\0' not in data:
+                  try:
+                      text = data.decode('utf-8-sig')
+                  except UnicodeDecodeError:
+                      pass
+              # Report each conflict marker with its file path and line number.
+              for line_number, line in enumerate(text.splitlines(), 1):
+                  if markers.fullmatch(line):
+                      errors.append(f'{name}:{line_number}: unresolved conflict marker')
+              # Unity input actions and assembly definitions/references also contain JSON.
+              if Path(name).suffix.lower() in {'.json', '.inputactions', '.asmdef', '.asmref'}:
+                  try:
+                      json.loads(data.decode('utf-8-sig'), parse_constant=invalid_constant)
+                  except ValueError as error:
+                      errors.append(f'{name}: invalid JSON: {error}')
+              # Only files inside Assets require Unity metadata and asset GUID checks.
+              if not name.startswith('Assets/'):
+                  continue
+              # Every tracked asset folder needs its own .meta; the Assets root is excluded.
+              folders.update(str(p) for p in PurePosixPath(name).parents if str(p) not in {'.', 'Assets'})
+              # The matching .meta must be committed, not merely present on a developer's machine.
+              if not name.endswith('.meta'):
+                  if name + '.meta' not in files:
+                      errors.append(f'{name}: missing tracked .meta file')
+                  continue
+              # Each .meta must contain one 32-digit hexadecimal GUID, unique across tracked Assets.
+              # Compare GUIDs without case differences and include the other file in duplicate errors.
+              values = re.findall(r'^guid:[ \t]*(\S+)[ \t]*\r?$', text, re.MULTILINE)
+              if len(values) != 1 or not re.fullmatch(r'[0-9a-fA-F]{32}', values[0]):
+                  errors.append(f'{name}: expected exactly one valid GUID')
+              elif values[0].lower() in guids:
+                  errors.append(f'{name}: GUID also used by {guids[values[0].lower()]}')
+              else:
+                  guids[values[0].lower()] = name
+          # Check folder metadata after collecting all ancestors, then fail with all findings at once.
+          errors.extend(f'{folder}: missing tracked folder .meta file' for folder in sorted(folders) if folder + '.meta' not in files)
+          if errors:
+              raise SystemExit('\n'.join(errors))
+          print(f'Repository checks passed: {len(files)} tracked files, {len(guids)} unique asset GUIDs.')
+          PY
+
+      # Restore dependencies kept outside Git, preserving their Assets paths and original .meta files.
+      - name: Download external Spine and TMP dependencies
+        env:
+          # Use a GitHub Contents API URL for the ZIP in the separate private dependency repository.
+          CI_DEPENDENCIES_URL: ${{ secrets.CI_DEPENDENCIES_URL }}
+          # This token only needs Contents: Read access to that dependency repository.
+          CI_DEPENDENCIES_TOKEN: ${{ secrets.CI_DEPENDENCIES_TOKEN }}
+          CI_DEPENDENCIES_SHA256: ${{ vars.CI_DEPENDENCIES_SHA256 }}
+        run: |
+          # Report the missing setting by name instead of failing with an unexplained exit code.
+          for setting in CI_DEPENDENCIES_URL CI_DEPENDENCIES_TOKEN CI_DEPENDENCIES_SHA256; do
+            if [ -z "${!setting}" ]; then
+              echo "::error::Configure $setting in Settings > Secrets and variables > Actions."
+              exit 1
+            fi
+          done
+          # Only send the dependency token to GitHub's Contents API.
+          case "$CI_DEPENDENCIES_URL" in
+            https://api.github.com/repos/*/contents/*) ;;
+            *) echo "::error::CI_DEPENDENCIES_URL must be a GitHub Contents API URL."; exit 1 ;;
+          esac
+          # Request raw ZIP bytes, authenticate the private repository and fail on HTTP errors.
+          curl --fail --location --silent --show-error --proto '=https' --proto-redir '=https' \
+            --header "Authorization: Bearer $CI_DEPENDENCIES_TOKEN" \
+            --header "Accept: application/vnd.github.raw+json" \
+            "$CI_DEPENDENCIES_URL" -o "$RUNNER_TEMP/dependencies.zip"
+          # Verify the exact archive bytes before extracting them into the Unity project.
+          printf '%s  %s\n' "$CI_DEPENDENCIES_SHA256" "$RUNNER_TEMP/dependencies.zip" | sha256sum --check -
+          unzip -q "$RUNNER_TEMP/dependencies.zip" -d "$GITHUB_WORKSPACE"
+
+      # Reuse imported assets to speed up later runs; Unity still imports changed assets and compiles.
+      - name: Cache Unity imports
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: Library
+          # Separate caches by Unity version, build target, dependency archive and project files.
+          key: Library-6000.3.22f1-WebGL-${{ vars.CI_DEPENDENCIES_SHA256 }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          # If no exact cache exists, start from an older cache with the same version/target/dependencies.
+          restore-keys: |
+            Library-6000.3.22f1-WebGL-${{ vars.CI_DEPENDENCIES_SHA256 }}-
+
+      # Install the required editor and WebGL module directly on the runner; reuse the installation cache.
+      - name: Install Unity 6000.3.22f1 and WebGL support
+        uses: buildalon/unity-setup@30fcbcb56c10ea5d64298e970d952b8d29bc268b # v2
+        with:
+          unity-version: 6000.3.22f1
+          build-targets: WebGL
+          # Pin Hub below 3.20: this action expects the legacy /opt/unityhub installation path.
+          hub-version: '3.19.5'
+          cache-installation: true
+
+      # Activate Personal through the licensing client using Unity account secrets.
+      # The action runs license cleanup in its post step after the job finishes.
+      - name: Activate Unity Personal license
+        uses: buildalon/activate-unity-license@e0d245d0787b7b9931b56ccbde3b508f6b70f1af # v2
+        with:
+          license: personal
+          username: ${{ secrets.UNITY_EMAIL }}
+          password: ${{ secrets.UNITY_PASSWORD }}
+
+      # Import and compile in batch mode, then build enabled scenes using the existing editor entry point.
+      # CiBuild exits with code 0 on success or 1 on failure; the project version stays unchanged.
+      - name: Import, compile and build WebGL
+        run: |
+          xvfb-run --auto-servernum "$UNITY_EDITOR_PATH" \
+            -batchmode -nographics \
+            -projectPath "$GITHUB_WORKSPACE" \
+            -buildTarget WebGL \
+            -executeMethod Game.Editor.CiBuild.BuildWebGL \
+            -customBuildPath "$GITHUB_WORKSPACE/build/WebGL" \
+            -logFile -
+
+      # Confirm that the entry page and all three Brotli/fallback payloads were produced.
+      - name: Verify build output
+        run: |
+          test -s build/WebGL/index.html
+          for payload in data framework.js wasm; do
+            test -n "$(find build/WebGL/Build -type f -name "*.$payload.unityweb" -size +0c -print -quit)"
+          done
+
+      # Only a caller requesting release output stores an artifact; ordinary PR checks stop above.
+      - name: Upload verified WebGL build
+        if: inputs.upload-build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: webgl-build
+          path: build/WebGL
+          if-no-files-found: error
+          retention-days: 7
+          # Unity has already compressed the large payloads with Brotli.
+          compression-level: 0
