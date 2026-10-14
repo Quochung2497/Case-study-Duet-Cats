@@ -51,7 +51,6 @@ namespace Game
         // Injector scans [Provide] methods and registers each object by its return type.
         [Provide] public IScoreRules ProvideScoreRules() => settings.ScoreRules;
         [Provide] public CatAnimationSet ProvideCatAnimationSet() => settings.CatAnimations;
-        [Provide] public CtaAnimationSet ProvideCtaAnimationSet() => settings.CtaAnimations;
         [Provide] public INoteSettings ProvideNoteSettings() => settings.Notes;
         // Awake resolves the song before Injector registers this provider.
         [Provide] public SongDefinition ProvideSelectedSong() => _selectedSong;
