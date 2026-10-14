@@ -12,7 +12,6 @@ namespace Game
         [Header("Shared assets")]
         [SerializeField] private SongCatalog songCatalog;
         [SerializeField] private CatAnimationSet catAnimations;
-        [SerializeField] private CtaAnimationSet ctaAnimations;
         [SerializeField] private InputReader inputReader;
 
         [Header("Hit VFX")]
@@ -39,7 +38,6 @@ namespace Game
 
         public SongCatalog SongCatalog => songCatalog;
         public CatAnimationSet CatAnimations => catAnimations;
-        public CtaAnimationSet CtaAnimations => ctaAnimations;
         public IInputReader InputReader => inputReader;
 
         public INoteSettings Notes => notes;

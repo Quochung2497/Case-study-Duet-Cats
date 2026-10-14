@@ -42,9 +42,15 @@ namespace Game
             if (_rootRect == null || _camera == null) return;
 
             var size = _rootRect.rect.size;
-            // The Canvas can still report zero size during scene initialization.
-            if (size.x <= 0f || size.y <= 0f) size = _camera.pixelRect.size;
-            if (size.x <= 0f || size.y <= 0f) return;
+            var scale = _rootRect.lossyScale;
+            // CanvasScaler can map many screen pixels to one local UI unit, so pixelRect is not
+            // a substitute for an uninitialized Canvas rect. Zero world scale also collapses its corners.
+            if (size.x <= 0f || size.y <= 0f || scale.x == 0f || scale.y == 0f)
+            {
+                // Retry on the next check; becoming valid again must publish a fresh event.
+                HasViewport = false;
+                return;
+            }
             var pixelRect = _camera.pixelRect;
             var aspect = _camera.aspect;
             var orthoSize = _camera.orthographicSize;

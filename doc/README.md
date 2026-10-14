@@ -35,7 +35,7 @@ One Unity WebGL scene supports portrait and landscape, with two cats and four no
 - **Data-driven/ScriptableObject:** `PlayableSettings` groups system settings and references song/animation assets. `SongCatalog` pairs audio, JSON, and playback options; `CatAnimationSet` maps cues to clip variants, loops, and mix durations. Particle shape/bursts are authored in prefabs.
 - **FSM/Builder:** Game states (`Start`, `Playing`, `Result`, `Cta`) and cat states (`Idle`, `Playing`, `Hit`, `Result`) share the FSM framework and are built in installers. `CanTransition()` exposes action readiness.
 - **Logic/presentation separation:** Drag rules and note timing sit outside MonoBehaviours. `CatAnimationController` handles Spine playback; `GameUIController` owns visibility rules, fades, and delays; `GameStateUI` applies view changes.
-- **Responsive layout:** `ViewportController` checks for changes and publishes events. `LayoutMath` calculates gameplay geometry; UI applies captured portrait/landscape layouts, while CTA selects an orientation-specific animation clip.
+- **Responsive layout:** `ViewportController` checks for changes and publishes events. `LayoutMath` calculates gameplay geometry and derives UI group layouts from portrait baselines and rules. Only Status Layout and CTA Panel have responsive components; their children scale with the groups, and CTA uses its original portrait clip.
 - **Object Pool:** `NoteInstaller` owns `NotePool`, backed by Unity's `ObjectPool<T>`. `NoteManager` uses `INotePool` and `INoteBehaviour`; prefab creation stays at the Unity boundary.
 - **Singleton:** `Injector` retains `Singleton<T>`; game and score services use interfaces.
 - **Events:** Pointer, hit, miss, song, score, state, and viewport events notify listeners.
@@ -49,5 +49,5 @@ Personal constraints left 1–2 days for the original playable, prioritizing gam
 - **Runtime song switching:** Selection is captured at scene setup; there is no song-selection UI, and music resources are limited. Future switching would move selection out of the installer and connect a selection UI to playback reconfiguration.
 - **Testing:** No project test cases or unit tests have been added yet.
 - **Sessions:** Replay reloads the scene. Cat reset support exists, but complete same-scene replay and coordinated pause are not wired.
-- **Landscape UI:** Layout snapshots and clip variants require manual authoring and visual review across device ratios. Future layout rules could calculate positions and sizes from canvas dimensions to reduce manual adjustment.
+- **Landscape UI:** Rules calculate group position and scale across ratios, but padding, animation bounds, and readability still need visual review on devices. The current approach preserves portrait composition; a distinct landscape arrangement would need further layout rules.
 - **CTA:** Cards are visual; production destinations would replace the current reload-on-tap behavior.
