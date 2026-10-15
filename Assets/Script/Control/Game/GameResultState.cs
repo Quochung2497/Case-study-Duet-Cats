@@ -1,5 +1,4 @@
 using Game;
-using UnityEngine;
 
 namespace Control.Game
 {
@@ -10,7 +9,7 @@ namespace Control.Game
         private readonly ICatBehaviour _rightCat;
         private readonly IGameFlowSettings _settings;
         private readonly IGameHost _host;
-        private float _ctaAt;
+        private float _remainingSeconds;
 
         public GameResultState(INoteManager notes, ICatBehaviour leftCat, ICatBehaviour rightCat,
             IGameFlowSettings settings, IGameHost host) : base(GameState.Result)
@@ -24,7 +23,7 @@ namespace Control.Game
 
         public override void EnterState()
         {
-            _ctaAt = Time.unscaledTime + _settings.ResultSeconds;
+            _remainingSeconds = _settings.ResultSeconds;
             _notes.StopSong();
             _leftCat.ShowResult(_host.Won);
             _rightCat.ShowResult(_host.Won);
@@ -32,7 +31,8 @@ namespace Control.Game
 
         public override void UpdateState(float deltaTime)
         {
-            if (Time.unscaledTime >= _ctaAt)
+            _remainingSeconds -= deltaTime;
+            if (_remainingSeconds <= 0f)
                 _host.TransitionTo(GameState.Cta);
         }
     }

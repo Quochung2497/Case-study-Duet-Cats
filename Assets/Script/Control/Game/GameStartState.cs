@@ -1,5 +1,4 @@
 using Game;
-using UnityEngine;
 
 namespace Control.Game
 {
@@ -8,7 +7,7 @@ namespace Control.Game
         private readonly INoteManager _notes;
         private readonly IGameFlowSettings _settings;
         private readonly IGameHost _host;
-        private float _startAt;
+        private float _remainingSeconds;
         private bool _starting;
 
         public GameStartState(INoteManager notes, IGameFlowSettings settings, IGameHost host)
@@ -23,13 +22,15 @@ namespace Control.Game
         {
             if (_starting) return;
             _starting = true;
-            _startAt = Time.unscaledTime + _settings.StartTransitionSeconds;
+            _remainingSeconds = _settings.StartTransitionSeconds;
             _host.BeginStartTransition();
         }
 
         public override void UpdateState(float deltaTime)
         {
-            if (!_starting || Time.unscaledTime < _startAt) return;
+            if (!_starting) return;
+            _remainingSeconds -= deltaTime;
+            if (_remainingSeconds > 0f) return;
             _starting = false;
 
             // Stay in Start and restore its UI if the song could not be scheduled.

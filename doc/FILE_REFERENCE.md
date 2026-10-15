@@ -4,7 +4,7 @@ This reference describes the current source on `build/refactor-and-improvement`.
 
 Paths below are relative to `Assets/Script`. `PlayerControls.cs` is generated from the Input Actions asset; third-party Spine source is outside this inventory.
 
-Cross-checked against source commit `33cd662` and the saved scene/settings/prefabs. Dependencies list the principal contracts, data and APIs rather than every framework import.
+Cross-checked against the current source and the saved scene/settings/prefabs. Dependencies list the principal contracts, data and APIs rather than every framework import.
 
 ## 1. Scene setup and dependency injection
 
@@ -66,9 +66,9 @@ Cross-checked against source commit `33cd662` and the saved scene/settings/prefa
 | `Behaviour/GameManager.cs` | Implements IGameState/IGameHost. Receives an installer-built FSM, routes input/note events, ticks with unscaled delta time, stores Won and publishes UI events. Owns delayed scene reload. | `IStateMachine<GameState>`, Start/Playing/Cta event states, INoteManager, IInputReader, IGameFlowSettings and Unity SceneManager. |
 | `Behaviour/IGameState.cs` | State/Won and StateChanged/StartTransitionBegan for consumers; ConfigureStateMachine/Initialize for setup. | GameState, game states/FSM, INoteManager, IInputReader and IGameFlowSettings. |
 | `Control/Game/IGameHost.cs` | Contract for state requests: transitions, finish run, begin/restore Start UI and schedule reload. Exposes Won for Result. | GameState. |
-| `Control/Game/GameStartState.cs` | Accepts the first tap, starts the UI transition and waits using unscaled time. Schedules the song before requesting Playing; restores Start UI if scheduling fails. | INoteManager, IGameFlowSettings, IGameHost, `State<GameState>` and Unity Time. |
+| `Control/Game/GameStartState.cs` | Accepts the first tap, starts the UI transition and counts down using the delta supplied by the FSM. Schedules the song before requesting Playing; restores Start UI if scheduling fails. | INoteManager, IGameFlowSettings, IGameHost and `State<GameState>`. |
 | `Control/Game/GamePlayingState.cs` | Enter resets score/starts cats. Loss finishes immediately. A configured boolean can defer a win until both cats report CanTransition; Update retries a pending win and Exit clears it. | IScoreManager, two ICatBehaviour contracts, IGameHost, setup boolean and `State<GameState>`. |
-| `Control/Game/GameResultState.cs` | Enter stops playback and shows outcome clips. Requests Cta after ResultSeconds using unscaled time. | INoteManager, ICatBehaviour, IGameFlowSettings, IGameHost and `State<GameState>`. |
+| `Control/Game/GameResultState.cs` | Enter stops playback, shows outcome clips and resets the countdown. Requests Cta after ResultSeconds using the delta supplied by the FSM. | INoteManager, ICatBehaviour, IGameFlowSettings, IGameHost and `State<GameState>`. |
 | `Control/Game/GameCtaState.cs` | Enter hides cats. First tap requests delayed reload; later taps are ignored for that state instance. | ICatBehaviour, IGameHost and `State<GameState>`. |
 
 ## 6. Cat input and movement
