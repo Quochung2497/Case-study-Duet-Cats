@@ -3,34 +3,21 @@ using Control;
 using Control.Cat;
 using Control.Note;
 using Input;
-using Spine.Unity;
 using UnityEngine;
-using Utility;
 
 namespace Game
 {
-    public class CatBehaviour : MonoBehaviour, ICatAnimation
+    public class CatBehaviour : MonoBehaviour, ICatBehaviour, ICatSetup
     {
+        // This behaviour bridges Unity input and transforms with plain-C# action and FSM logic.
         #region Fields and events
 
-        private static readonly CatClip[] IdleClips =
-        {
-            CatClip.IdleStart,
-            CatClip.IdlePlaying,
-            CatClip.IdleHungry,
-            CatClip.IdleLiemchan,
-            CatClip.IdleYawn
-        };
-
         private IInputReader _input;
-        private ResponsiveLayout _layout;
+        private IResponsiveLayout _layout;
         private ICatAction _action;
         private IStateMachine<CatState> _fsm;
         private CatHitState _hitState;
         private CatResultState _resultState;
-        private SkeletonAnimation _spine;
-        private int _animVersion;
-        private int _lastIdle = -1;
         private bool _left;
         private bool _playing;
         private bool _subscribed;
@@ -42,37 +29,56 @@ namespace Game
 
         #region Setup and gameplay
 
-        public void Initialize(ICatAction action, IStateMachine<CatState> fsm, CatHitState hitState,
-            CatResultState resultState, bool left, IInputReader input, ResponsiveLayout layout)
+        public void ConfigureStateMachine(IStateMachine<CatState> fsm, CatHitState hitState,
+            CatResultState resultState)
         {
-            _action = action;
             _fsm = fsm;
             _hitState = hitState;
             _resultState = resultState;
+        }
+
+        public void Initialize(ICatAction action, bool left, IInputReader input, IResponsiveLayout layout)
+        {
+            // CatInstaller supplies the action and scene input after building the FSM.
+            _action = action;
             _left = left;
             _input = input;
             _layout = layout;
             if (isActiveAndEnabled) Subscribe();
         }
 
-        public void SetupAnimation(SkeletonAnimation spine) => _spine = spine;
-
         public void OnNoteHit(NoteVisualType type)
         {
             if (_fsm == null || _fsm.CurrentStateKey == CatState.Result) return;
 
+            // Set the hit type before entering Hit so the state selects the correct clip.
             _hitState.OnHit(type);
             if (_fsm.CurrentStateKey != CatState.Hit)
                 _fsm.TransitionToState(CatState.Hit);
 
+            // VFX and hit text listen to this event; CatBehaviour does not reference them.
             NoteHit?.Invoke(type);
         }
+
+        public bool CanTransition() => _fsm.CanTransition();
 
         public void StartPlaying()
         {
             _playing = true;
+            if (isActiveAndEnabled) Subscribe();
+
+            // Stay Idle while dragging; return to Listening/Playing after release.
             if (_fsm != null && !_action.IsDragging && _fsm.CurrentStateKey == CatState.Idle)
                 _fsm.TransitionToState(CatState.Playing);
+        }
+
+        public void ResetForRun()
+        {
+            // Prepare an initialized cat for another run without rebuilding its dependencies.
+            _playing = false;
+            CancelDrag();
+            _fsm.TransitionToState(CatState.Idle);
+            if (isActiveAndEnabled) Subscribe();
         }
 
         public void StopPlaying()
@@ -83,6 +89,7 @@ namespace Game
 
         public void ShowResult(bool won)
         {
+            // Stop drag input before entering the win or loss animation.
             StopPlaying();
             if (_fsm == null) return;
 
@@ -90,41 +97,7 @@ namespace Game
             _fsm.TransitionToState(CatState.Result);
         }
 
-        #endregion
-
-        #region Animation
-
-        public void PlayIdle(Action onComplete)
-        {
-            var index = UnityEngine.Random.Range(0, IdleClips.Length);
-            if (index == _lastIdle) index = (index + 1) % IdleClips.Length;
-            _lastIdle = index;
-            Play(IdleClips[index], false, onComplete);
-        }
-
-        public void PlayPlaying() => Play(CatClip.Listening, true);
-
-        public void PlayResult(bool won) =>
-            Play(won ? CatClip.Victory : CatClip.MissObjectLose2, true);
-
-        public void PlayHit(NoteVisualType type, Action onComplete)
-        {
-            var clip = type == NoteVisualType.Normal
-                ? (UnityEngine.Random.value < 0.5f ? CatClip.EatingSingle1 : CatClip.EatingSingle2)
-                : CatClip.EatShot;
-            Play(clip, false, onComplete);
-        }
-
-        private void Play(CatClip clip, bool loop, Action onComplete = null)
-        {
-            var version = ++_animVersion;
-            var entry = AnimationPlayer.Play(_spine, clip, loop);
-            if (onComplete != null)
-                entry.Complete += _ =>
-                {
-                    if (version == _animVersion) onComplete();
-                };
-        }
+        public void SetVisible(bool visible) => gameObject.SetActive(visible);
 
         #endregion
 
@@ -147,6 +120,7 @@ namespace Game
             if (_fsm == null) return;
 
             _fsm.Tick(Time.deltaTime);
+            // After the hit clip, CatBehaviour selects Listening or Idle from the current drag state.
             if (_fsm.CurrentStateKey == CatState.Hit && _hitState.IsComplete)
                 _fsm.TransitionToState(_playing && !_action.IsDragging ? CatState.Playing : CatState.Idle);
         }
@@ -157,6 +131,7 @@ namespace Game
 
         private void Subscribe()
         {
+            // Repeated lifecycle calls must not register duplicate input callbacks.
             if (_subscribed || _input == null) return;
             _input.PointerDown += OnPointerDown;
             _input.PointerMoved += OnPointerMoved;
@@ -177,6 +152,7 @@ namespace Game
 
         private void CancelDrag()
         {
+            // A layout change invalidates the old drag coordinates, so cancel the drag.
             if (_action == null || !_action.IsDragging) return;
             _action.Cancel();
             ResumeListening();
@@ -190,6 +166,7 @@ namespace Game
 
         private void OnPointerDown(PointerSample sam)
         {
+            // Convert screen pixels to world X before CatAction checks the left or right half.
             var data = _layout.Current;
             var centerX = (data.PlayLeft + data.PlayRight) * 0.5f;
             var pointerX = _layout.ScreenToWorldX(sam.ScreenX, sam.ScreenY);
@@ -200,6 +177,7 @@ namespace Game
 
         private void OnPointerMoved(PointerSample sam)
         {
+            // Use this cat's bounds; the action returns a new X only for its pointer ID.
             var data = _layout.Current;
             var minX = _left ? data.LeftMinX : data.RightMinX;
             var maxX = _left ? data.LeftMaxX : data.RightMaxX;

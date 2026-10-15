@@ -18,6 +18,7 @@ namespace Control.Cat
 
         public void OnHit(NoteVisualType type)
         {
+            // Another hit during Hit replaces the current animation with the new hit clip.
             _type = type;
             if (StateMachine != null && StateMachine.CurrentStateKey == CatState.Hit)
                 PlayHit();
@@ -25,8 +26,11 @@ namespace Control.Cat
 
         public override void EnterState() => PlayHit();
 
+        public override bool CanTransition() => _complete;
+
         private void PlayHit()
         {
+            // The callback only reports completion; CatBehaviour chooses the next state.
             _complete = false;
             _animation.PlayHit(_type, () => _complete = true);
         }

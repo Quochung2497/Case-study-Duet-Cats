@@ -11,6 +11,7 @@ namespace Control.Cat
             _animation = animation;
         }
 
+        // Loop Listening while the song plays and the cat is not being dragged.
         public override void EnterState() => _animation.PlayPlaying();
     }
 }

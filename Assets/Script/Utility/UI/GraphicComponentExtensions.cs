@@ -6,6 +6,7 @@ namespace Utility
 {
   public static class GraphicComponentExtensions
   {
+    // These helpers change alpha and color without repeating component-type checks in UI callers.
     /// <summary>
     /// Searches the GameObject for a component that supports alpha (CanvasGroup, Graphic, or TMP).
     /// Returns the first one found, or null if none is present.
@@ -14,6 +15,7 @@ namespace Utility
     {
       if (go == null)
         return null;
+      // Prefer CanvasGroup so the whole UI subtree can be shown or hidden together.
       if (go.TryGetComponent<CanvasGroup>(out var canvasGroup))
         return canvasGroup;
       if (go.TryGetComponent<Graphic>(out var graphic))
@@ -60,19 +62,19 @@ namespace Utility
       }
       else if (comp is Graphic graphic)
       {
-        Color c = graphic.color;
+        var c = graphic.color;
         c.a = alpha;
         graphic.color = c;
       }
       else if (comp is TextMeshProUGUI tmp)
       {
-        Color c = tmp.color;
+        var c = tmp.color;
         c.a = alpha;
         tmp.color = c;
       }
       else if (comp is SpriteRenderer sr)
       {
-        Color c = sr.color;
+        var c = sr.color;
         c.a = alpha;
         sr.color = c;
       }

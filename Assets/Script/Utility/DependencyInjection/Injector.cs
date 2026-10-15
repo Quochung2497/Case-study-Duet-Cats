@@ -44,6 +44,7 @@ namespace Utility.DependencyInjection
 
     private void InitializeDependencies()
     {
+      // Register all providers before injecting dependencies into consumers.
       // Find all classes that implement IDependencyProvider
       var providers = FindMonoBehaviours().OfType<IDependencyProvider>();
       foreach (var provider in providers)
@@ -66,6 +67,7 @@ namespace Utility.DependencyInjection
     /// <returns>The resolved instance or null if not found.</returns>
     private object Resolve(Type type)
     {
+      // The registry uses the exact Type as its key; missing entries return null for Inject to report.
       _registry.TryGetValue(type, out var value);
       return value;
     }
@@ -77,6 +79,7 @@ namespace Utility.DependencyInjection
     private void Inject(object value)
     {
       var type = value.GetType();
+      // Use reflection to populate fields and invoke methods marked [Inject].
       var injectableFields = type.GetFields(KBindingFlags)
         .Where(f => Attribute.IsDefined(f, typeof(InjectAttribute)));
 
@@ -101,6 +104,7 @@ namespace Utility.DependencyInjection
 
       foreach (var method in injectableMethods)
       {
+        // Resolve each method parameter by its declared type.
         var parameters = method.GetParameters();
         var resolvedParameters = parameters.Select(parameter => parameter.ParameterType).ToArray();
 
@@ -154,6 +158,7 @@ namespace Utility.DependencyInjection
     /// <param name="provider">The provider to register.</param>
     private void RegisterProvider(IDependencyProvider provider)
     {
+      // Invoke each [Provide] method and register its result by return type.
       var methods = provider.GetType().GetMethods(KBindingFlags);
 
       foreach (var method in methods)
@@ -183,6 +188,7 @@ namespace Utility.DependencyInjection
     /// <returns>An enumerable of MonoBehaviour objects.</returns>
     static IEnumerable<MonoBehaviour> FindMonoBehaviours()
     {
+      // Scan scene instances, not prefab assets that have not been instantiated.
       return FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.InstanceID);
     }
   }

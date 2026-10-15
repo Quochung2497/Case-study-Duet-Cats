@@ -24,6 +24,7 @@ namespace Input
 
         public void Initialize()
         {
+            // A ScriptableObject can be enabled again; avoid registering callbacks twice.
             if (_controls != null)
                 return;
 
@@ -39,6 +40,7 @@ namespace Input
 
         public void Shutdown()
         {
+            // Disable the action map and dispose its wrapper when the scene ends.
             if (_controls == null)
                 return;
 
@@ -57,6 +59,7 @@ namespace Input
             if (!ctx.performed)
                 return;
 
+            // Prefer real touch and briefly suppress the mouse event emulated after it.
             if (ctx.control.parent is TouchControl touch)
             {
                 _mouseBlockedUntil = ctx.time + MouseTouchDelay;
@@ -77,6 +80,7 @@ namespace Input
             if (!ctx.performed)
                 return;
 
+            // Emit moves only for touches previously accepted on press.
             if (ctx.control.parent is TouchControl touch)
             {
                 _mouseBlockedUntil = ctx.time + MouseTouchDelay;
@@ -106,7 +110,7 @@ namespace Input
                 if (_touches.ContainsKey(touch))
                     return;
 
-                // A real touch takes precedence over an emulated mouse pointer.
+                // A real touch replaces the emulated mouse so one cat is not dragged by two IDs.
                 if (_mouseDown)
                 {
                     _mouseDown = false;
@@ -117,6 +121,7 @@ namespace Input
                 }
 
                 var pos = touch.position.ReadValue();
+                // Assign each finger a unique ID until release.
                 var sam = new PointerSample(_nextPointerId++, pos.x, pos.y);
                 _touches.Add(touch, sam);
                 PointerDown?.Invoke(sam);

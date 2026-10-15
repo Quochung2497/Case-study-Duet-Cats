@@ -7,9 +7,11 @@ namespace Game
     public class ScoreUI : MonoBehaviour
     {
         [SerializeField] private TMP_Text scoreText;
-        [Inject] private GameManager _game;
+        [SerializeField] private string loseParameterName = "Lose";
+        [SerializeField] private bool loseParameterValue = true;
+        [Inject] private IGameState _game;
+        [Inject] private IScoreManager _score;
 
-        private ScoreManager _score;
         private Animator _statusAnimator;
 
         private void Awake()
@@ -21,7 +23,7 @@ namespace Game
 
         private void OnEnable()
         {
-            _score = ScoreManager.Instance;
+            // On enable, display the current score before waiting for later changes.
             _score.ScoreChanged += Refresh;
             _game.StateChanged += OnGameStateChanged;
             Refresh();
@@ -36,8 +38,9 @@ namespace Game
 
         private void OnGameStateChanged(GameState state)
         {
+            // Set the configured Animator parameter only for a losing Result.
             if (state == GameState.Result && !_game.Won && _statusAnimator != null)
-                _statusAnimator.SetBool("Lose", true);
+                _statusAnimator.SetBool(loseParameterName, loseParameterValue);
         }
 
         private void Refresh()

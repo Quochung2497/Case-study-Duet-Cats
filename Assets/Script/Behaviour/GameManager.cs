@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using Control;
+using Control.Game;
 using Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,7 +16,7 @@ namespace Game
         Cta
     }
 
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour, IGameState, IGameHost
     {
 #if UNITY_EDITOR
         [Header("Debug")]
@@ -22,31 +24,33 @@ namespace Game
         [SerializeField] private bool ignoreMisses;
 #endif
 
-        private NoteManager _notes;
-        private CatBehaviour _leftCat;
-        private CatBehaviour _rightCat;
+        private INoteManager _notes;
         private IInputReader _input;
-        private ScoreManager _score;
-        private PlayableSettings _settings;
-        private float _ctaAt;
-        private float _startAt;
-        private bool _starting;
-        private bool _reloading;
+        private IGameFlowSettings _settings;
+        private IStateMachine<GameState> _fsm;
+        private GameStartState _startState;
+        private GamePlayingState _playingState;
+        private GameCtaState _ctaState;
 
-        public GameState State { get; private set; } = GameState.Start;
+        public GameState State => _fsm?.CurrentStateKey ?? GameState.Start;
         public bool Won { get; private set; }
         public event Action<GameState> StateChanged;
         public event Action StartTransitionBegan;
 
-        public void Initialize(NoteManager notes, CatBehaviour leftCat, CatBehaviour rightCat,
-            IInputReader input, PlayableSettings settings)
+        public void ConfigureStateMachine(IStateMachine<GameState> fsm, GameStartState startState,
+            GamePlayingState playingState, GameCtaState ctaState)
+        {
+            _fsm = fsm;
+            _startState = startState;
+            _playingState = playingState;
+            _ctaState = ctaState;
+        }
+
+        public void Initialize(INoteManager notes, IInputReader input, IGameFlowSettings settings)
         {
             _notes = notes;
-            _leftCat = leftCat;
-            _rightCat = rightCat;
             _input = input;
             _settings = settings;
-            _score = ScoreManager.Instance;
 
             _input.PointerDown += OnPointerDown;
             _notes.NoteMissed += OnNoteMissed;
@@ -54,23 +58,8 @@ namespace Game
         }
 
         private void Start() => StateChanged?.Invoke(State);
-        private void Update()
-        {
-            UpdateStart();
-            UpdateResult();
-        }
 
-        private void UpdateStart()
-        {
-            if (!_starting || Time.unscaledTime < _startAt) return;
-            BeginPlaying();
-        }
-
-        private void UpdateResult()
-        {
-            if (State == GameState.Result && Time.unscaledTime >= _ctaAt)
-                ShowCta();
-        }
+        private void Update() => _fsm?.Tick(Time.unscaledDeltaTime);
 
         private void OnDestroy()
         {
@@ -83,18 +72,9 @@ namespace Game
         private void OnPointerDown(PointerSample _)
         {
             if (State == GameState.Start)
-                StartGame();
-            else if (State == GameState.Cta && !_reloading)
-            {
-                _reloading = true;
-                StartCoroutine(ReloadSceneAfterDelay());
-            }
-        }
-
-        private IEnumerator ReloadSceneAfterDelay()
-        {
-            yield return new WaitForSecondsRealtime(_settings.CtaReloadSeconds);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                _startState.OnPointerDown();
+            else if (State == GameState.Cta)
+                _ctaState.OnPointerDown();
         }
 
         private void OnNoteMissed()
@@ -102,55 +82,40 @@ namespace Game
 #if UNITY_EDITOR
             if (ignoreMisses) return;
 #endif
-            EndGame(false);
-        }
-        private void OnSongFinished() => EndGame(true);
-
-        public void StartGame()
-        {
-            if (State != GameState.Start || _starting) return;
-            _starting = true;
-            _startAt = Time.unscaledTime + _settings.StartTransitionSeconds;
-            StartTransitionBegan?.Invoke();
+            if (State == GameState.Playing) _playingState.OnNoteMissed();
         }
 
-        private void BeginPlaying()
+        private void OnSongFinished()
         {
-            _starting = false;
-            if (!_notes.StartSong())
-            {
-                StateChanged?.Invoke(State);
-                return;
-            }
+            if (State == GameState.Playing) _playingState.OnSongFinished();
+        }
 
-            _score.ResetScore();
-            State = GameState.Playing;
-            _leftCat.StartPlaying();
-            _rightCat.StartPlaying();
+        void IGameHost.TransitionTo(GameState nextState) => ChangeState(nextState);
+
+        private void ChangeState(GameState nextState)
+        {
+            if (State == nextState) return;
+            _fsm.TransitionToState(nextState);
             StateChanged?.Invoke(State);
         }
 
-        private void EndGame(bool won)
+        void IGameHost.FinishRun(bool won)
         {
             if (State != GameState.Playing) return;
-
             Won = won;
-            State = GameState.Result;
-            _ctaAt = Time.unscaledTime + _settings.ResultSeconds;
-            _notes.StopSong();
-            _leftCat.ShowResult(won);
-            _rightCat.ShowResult(won);
-            StateChanged?.Invoke(State);
+            ChangeState(GameState.Result);
         }
 
-        public void ShowCta()
-        {
-            if (State != GameState.Result) return;
+        void IGameHost.BeginStartTransition() => StartTransitionBegan?.Invoke();
 
-            State = GameState.Cta;
-            _leftCat.gameObject.SetActive(false);
-            _rightCat.gameObject.SetActive(false);
-            StateChanged?.Invoke(State);
+        void IGameHost.RefreshCurrentState() => StateChanged?.Invoke(State);
+
+        void IGameHost.ScheduleReload() => StartCoroutine(ReloadSceneAfterDelay());
+
+        private IEnumerator ReloadSceneAfterDelay()
+        {
+            yield return new WaitForSecondsRealtime(_settings.CtaReloadSeconds);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }

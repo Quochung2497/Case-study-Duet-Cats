@@ -5,6 +5,7 @@ namespace Control
 {
     public class StateBuilder<TState> where TState : Enum
     {
+        // Collect states before creating the machine and choosing its initial state.
         private readonly List<IState<TState>> _states = new();
 
         public StateBuilder<TState> Add(IState<TState> state)

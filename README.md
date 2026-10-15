@@ -1,52 +1,56 @@
 # Duet Cats Playable — Technical Overview
 
+This README describes `build/refactor-and-improvement`. The original playable is on the `Main` branch.
+
 ## 1. Overall Project Structure
 
-This Unity WebGL playable uses one scene for portrait and landscape. `ResponsiveLayout` derives cat positions and four note lanes from the camera and layout profiles.
+One Unity WebGL scene supports portrait and landscape, with two cats and four note lanes.
 
 | Folder | Contents |
 | --- | --- |
 | `Assets/Scenes` | Playable scene. |
 | `Assets/Game` | Art, Spine data, audio, fonts, prefabs, and JSON charts. |
-| `Assets/Scriptable Object` | `PlayableSettings` and `InputReader` assets. |
+| `Assets/Scriptable Object` | Root settings, input, song catalog, and animation assets. |
 | `Assets/Script/Behaviour` | Cat, note, background, and game components. |
-| `Assets/Script/Control` | Cat actions/FSM, note parsing, timing, and pool. |
+| `Assets/Script/Control` | Game/cat FSMs, drag logic, note parsing, timeline, and pool. |
 | `Assets/Script/Installer` | Scene setup and dependency wiring. |
-| `Assets/Script/UI` and `Settings` | UI, score storage, and settings types. |
-| `Assets/Script/Utility` | Input, layout, injection, pooling, animation helpers. |
+| `Assets/Script/UI` | Views, controllers, scoring, and responsive layout. |
+| `Assets/Script/Settings` | System settings, layout data, and song/animation definitions. |
+| `Assets/Script/Utility` | Input, injection, generic pooling, and shared extensions. |
 
-`PlayableInstaller` provides scene references through `Injector`, keeping wiring out of gameplay scripts. `CatInstaller` builds each cat's action and FSM; `NoteInstaller` sets up the chart, pool, and `NoteManager`; `GameInstaller` connects them to `GameManager`. Hits update cats and score, while misses/song completion update game state. UI listens to score and state events.
+`PlayableSettings` holds tuning and shared assets. `PlayableInstaller` validates references/song selection before injection. `InputInstaller` owns input lifecycle; `CatInstaller` builds each cat's action, animation controller, and FSM; `NoteInstaller` builds timeline/pool; `GameInstaller` builds game FSM. `GameManager` routes events; UI and viewport controllers update presentation and layout.
 
 ## 2. Key Gameplay Systems
 
-1. **Start:** `NoteChart` validates and sorts JSON notes at initialization. The first tap fades the tutorial; after the configured transition, `GameManager` resets score and starts the song and `Playing` state.
-2. **Input:** `InputReader` converts touch/mouse actions to pointer events. Each `CatAction` claims one pointer on its side and clamps horizontal dragging to `ResponsiveLayout` bounds, allowing two simultaneous finger drags.
-3. **Spawn:** `NoteManager` schedules audio and `NoteTimeline` against `AudioSettings.dspTime`. Due events take a pooled `NoteBehaviour`, set its sprite/collider radius by type, and move it along one of four lanes over the configured travel time in `FixedUpdate`.
-4. **Hit and miss:** A trigger hit by the matching cat releases the note, plays eating animation, particles, and text, and adds **2** points for Normal, **5** for Strong, or **10** for Long/LolipopLong. `ScoreChanged` refreshes `ScoreUI`. A note surviving past travel time plus hit window raises `NoteMissed` and ends the one-life run; completing the chart and song wins.
-5. **Result:** `GameManager` stops audio and plays win/loss animations, then enters `CTA` and hides both cats after a delay. A CTA tap reloads the scene after its configured delay.
+1. **Setup/start:** Select a song in `PlayableInstaller`; checking another clears the previous choice. Missing references or invalid song selection stop startup. `NoteChart` validates and sorts JSON once. The first tap fades the tutorial; after the transition delay, Start schedules audio and enters Playing, resetting score and starting both cats.
+2. **Input:** `InputReader` converts touch/mouse actions to pointer events. Each `CatAction` owns a pointer on its side and clamps horizontal dragging to layout bounds, supporting two simultaneous touches.
+3. **Spawn:** `NoteManager` uses `AudioSettings.dspTime` for audio and note timing. `INoteTimeline` returns due events; pooled notes receive type-specific sprites/radii and move along their lanes in `FixedUpdate`.
+4. **Hit/miss:** A matching cat trigger plays hit feedback, awards **2** points for Normal, **5** for Strong, or **10** for Long/LolipopLong, then releases the note. `ScoreChanged` updates UI. Passing travel time plus the hit window raises a miss and ends the one-life run.
+5. **Result/replay:** When the chart and audio finish with no active notes, game flow requests a win. When configured, it waits for both cats' hit animations to finish. Result stops audio and plays the outcome; after a delay, CTA hides cats and shows the cards. A CTA tap reloads the scene.
+6. **Extension hooks:** `CatBehaviour.ResetForRun()` resets cat state and input without rebuilding it; timeline, note playback, and score also expose reset/restart methods. `SongCatalog` accepts more audio/chart pairs, and `INoteManager.Initialize()` accepts replacement playback dependencies. Settings expose variations in timing, scoring, feedback, animation, and layout. Complete same-scene replay and runtime selection still need coordinated game/UI flow.
 
 ## 3. Design Patterns and Architecture Decisions
 
-- **Installer/DI:** `PlayableInstaller` centralizes scene references; `Injector` supplies them to cat, note, and game installers.
-- **Data-driven/ScriptableObject:** JSON defines note time, lane, and type. `PlayableSettings` selects song/chart and exposes timing, layout, score, and feedback tuning without code edits.
-- **Logic and interfaces:** `CatAction`, `NoteChart`, and `NoteTimeline` sit outside MonoBehaviours. `IInputReader`, `ICatAction`, and `ICatAnimation` separate input, dragging, and animation consumers from their implementations.
-- **FSM/Builder:** Each cat uses `StateManager<CatState>` for `Idle`, `Playing`, `Hit`, and `Result`, assembled by `StateBuilder<CatState>`; dragging remains in `CatAction`.
-- **Responsive layout/animation mapping:** `ResponsiveLayout` uses camera size and portrait/landscape profiles for one scene; `AnimationPlayer` centralizes Spine clip names behind `CatClip` values.
-- **Object Pool:** `NotePool` reuses one note prefab through Unity's `ObjectPool<T>`, changing its sprite and collider radius per type instead of repeatedly instantiating notes.
-- **Singleton:** `Injector` and `ScoreManager` use the shared `Singleton<T>` utility.
-- **Events:** Pointer, hit, miss, song, score, and state events notify consumers without producers referencing their listeners.
+- **Installer/DI:** Installers compose systems and pass dependencies through contracts for input, cats, notes, score, game state, and layout.
+- **Data-driven/ScriptableObject:** `PlayableSettings` groups system settings and references song/animation assets. `SongCatalog` pairs audio, JSON, and playback options; `CatAnimationSet` maps cues to clip variants, loops, and mix durations. Particle shape/bursts are authored in prefabs.
+- **FSM/Builder:** Game states (`Start`, `Playing`, `Result`, `Cta`) and cat states (`Idle`, `Playing`, `Hit`, `Result`) share the FSM framework and are built in installers. `CanTransition()` exposes action readiness.
+- **Logic/presentation separation:** Drag rules and note timing sit outside MonoBehaviours. `CatAnimationController` handles Spine playback; `GameUIController` owns visibility rules, fades, and delays; `GameStateUI` applies view changes.
+- **Responsive layout:** `ViewportController` checks for changes and publishes events. `LayoutMath` calculates gameplay geometry and derives UI group layouts from portrait baselines and rules. Only Status Layout and CTA Panel have responsive components; their children scale with the groups, and CTA uses its original portrait clip. See [UI Layout Calculations](doc/UI_LAYOUT_CALCULATIONS.md) for equations and Inspector examples.
+- **Object Pool:** `NoteInstaller` owns `NotePool`, backed by Unity's `ObjectPool<T>`. `NoteManager` uses `INotePool` and `INoteBehaviour`; prefab creation stays at the Unity boundary.
+- **Singleton:** `Injector` retains `Singleton<T>`; game and score services use interfaces.
+- **Events:** Pointer, hit, miss, song, score, state, and viewport events notify listeners.
 
 ## 4. Trade-offs, Simplifications, and Improvement Ideas
 
-Personal constraints left only 1–2 days to build this playable, so I prioritized a working game loop and mobile WebGL build:
+Personal constraints left 1–2 days for the original playable, prioritizing gameplay and mobile WebGL. The refactors above were added afterwards. Remaining limits:
 
-- **Game flow:** `GameManager` changes states directly. Applying the existing FSM framework to `Start`, `Playing`, `Result`, and `CTA` would isolate phase-specific transitions and timers.
-- **Coupling:** Some plain C# logic and UI still use concrete classes, such as `GameStateUI` reading `GameManager`. Small interfaces for state data and events would improve isolation.
 - **Notes:** All types use instant collision. Long notes could gain hold duration and begin/end handling.
-- **Chart data:** I used a custom JSON chart with only the fields this loop needs (`id`, `spawnTime`, `lane`, `visualType`). The original JSON's field meanings were unclear, and I could not seek clarification over the weekend. A later pass could map and validate the original data against the music.
-- **Variants:** One song/chart, a one-miss loss, and total score keep the run short. Chart variants, song start/end points, and session duration could enable A/B tests on the same game loop.
-- **CTA:** Song cards are visual only; a production build should open their destinations instead of reloading on tap.
-- **Landscape UI:** Gameplay adapts, but UI was tuned mainly for portrait. Landscape-specific `RectTransform` position, size, and rotation rules would improve it across screen ratios.
+- **Chart data:** Custom JSON keeps only `id`, `spawnTime`, `lane`, and `visualType`. The original field meanings were unclear and weekend clarification was unavailable; mapping the original schema remains future work.
+- **Runtime song switching:** Selection is captured at scene setup; there is no song-selection UI, and music resources are limited. Future switching would move selection out of the installer and connect a selection UI to playback reconfiguration.
+- **Testing:** No project test cases or unit tests have been added yet.
+- **Sessions:** Replay reloads the scene. Cat reset support exists, but complete same-scene replay and coordinated pause are not wired.
+- **Landscape UI:** Rules calculate group position and scale across ratios, but padding, animation bounds, and readability still need visual review on devices. The current approach preserves portrait composition; a distinct landscape arrangement would need further layout rules.
+- **CTA:** Cards are visual; production destinations would replace the current reload-on-tap behavior.
 
 ## 5. CI/CD
 

@@ -6,8 +6,9 @@ namespace Game
 {
     public class BackgroundBehaviour : MonoBehaviour
     {
-        [Inject] private PlayableSettings _settings;
+        [Inject] private SceneVisualSettings _settings;
         [Inject] private LayoutSceneRefs _refs;
+        [Inject] private IViewport _viewport;
 
         private SpriteRenderer _renderer;
         private Sprite _sprite;
@@ -17,27 +18,39 @@ namespace Game
 
         private void Awake() => SetupRenderer();
 
+        private void OnEnable()
+        {
+            if (_viewport == null) return;
+            _viewport.Changed += ApplyBackground;
+            if (_viewport.HasViewport) ApplyBackground(_viewport.IsPortrait);
+        }
+
+        private void OnDisable()
+        {
+            if (_viewport != null) _viewport.Changed -= ApplyBackground;
+        }
+
         private void SetupRenderer()
         {
             _renderer = gameObject.GetOrAdd<SpriteRenderer>();
             _renderer.sortingOrder = -100;
         }
 
-        private void LateUpdate() => RefreshBackground();
-
-        private void RefreshBackground()
+        private void ApplyBackground(bool isPortrait)
         {
             var cam = _refs?.Camera;
             if (_settings == null || cam == null || !cam.orthographic)
                 return;
 
-            var sprite = cam.aspect < 1f
+            // Choose the background sprite for the current screen orientation.
+            var sprite = isPortrait
                 ? _settings.PortraitBackground
                 : _settings.LandscapeBackground;
             if (sprite == null)
                 return;
 
             var camPos = cam.transform.position;
+            // Recalculate scale only when the sprite or camera changes.
             if (sprite == _sprite && Mathf.Approximately(cam.aspect, _aspect) &&
                 Mathf.Approximately(cam.orthographicSize, _orthoSize) &&
                 camPos == _cameraPos)
@@ -49,6 +62,7 @@ namespace Game
             var camHeight = cam.orthographicSize * 2f;
             var camWidth = camHeight * cam.aspect;
             var size = sprite.bounds.size;
+            // Use the larger scale factor to cover the camera in both dimensions.
             var scale = Mathf.Max(camWidth / size.x, camHeight / size.y);
 
             var pos = transform.position;

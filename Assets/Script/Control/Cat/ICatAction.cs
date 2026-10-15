@@ -1,5 +1,6 @@
 namespace Control.Cat
 {
+    // Keep drag rules outside MonoBehaviour, transforms, and the Input System.
     public interface ICatAction
     {
         bool IsDragging { get; }

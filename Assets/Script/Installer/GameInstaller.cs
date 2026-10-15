@@ -1,3 +1,5 @@
+using Control;
+using Control.Game;
 using Input;
 using UnityEngine;
 using Utility.DependencyInjection;
@@ -6,26 +8,40 @@ namespace Game
 {
     public sealed class GameInstaller : MonoBehaviour, IInstaller
     {
-        [Inject] private NoteManager _notes;
-        [Inject] private GameManager _manager;
+        [Inject] private INoteManager _notes;
+        [Inject] private IGameState _manager;
+        [Inject] private IGameHost _host;
         [Inject] private LayoutSceneRefs _sceneRefs;
         [Inject] private IInputReader _input;
-        [Inject] private PlayableSettings _settings;
+        [Inject] private IGameFlowSettings _settings;
+        [Inject] private IScoreManager _score;
 
         public void AwakeInitialize()
         {
-            if (_notes == null || _manager == null || _sceneRefs == null ||
-                _input == null || _settings == null ||
+            // Find the scene cats before building the game FSM.
+            if (_notes == null || _manager == null || _host == null || _sceneRefs == null ||
+                _input == null || _settings == null || _score == null ||
                 _sceneRefs.LeftCat == null || _sceneRefs.RightCat == null ||
-                !_sceneRefs.LeftCat.TryGetComponent(out CatBehaviour leftCat) ||
-                !_sceneRefs.RightCat.TryGetComponent(out CatBehaviour rightCat))
+                !_sceneRefs.LeftCat.TryGetComponent<ICatBehaviour>(out var leftCat) ||
+                !_sceneRefs.RightCat.TryGetComponent<ICatBehaviour>(out var rightCat))
             {
-                Debug.LogError("GameInstaller needs the note manager and both cats.", this);
+                Debug.LogError("GameInstaller needs the note manager, both cats, input, settings, and score manager.", this);
                 return;
             }
 
-            _manager.Initialize(_notes, leftCat, rightCat,
-                _input, _settings);
+            var startState = new GameStartState(_notes, _settings, _host);
+            var playingState = new GamePlayingState(_score, leftCat, rightCat,
+                _settings.WaitForCatActionsOnWin, _host);
+            var ctaState = new GameCtaState(leftCat, rightCat, _host);
+            var fsm = new StateBuilder<GameState>()
+                .Add(startState)
+                .Add(playingState)
+                .Add(new GameResultState(_notes, leftCat, rightCat, _settings, _host))
+                .Add(ctaState)
+                .Build(GameState.Start);
+
+            _manager.ConfigureStateMachine(fsm, startState, playingState, ctaState);
+            _manager.Initialize(_notes, _input, _settings);
         }
 
         public void StartInitialize() { }
