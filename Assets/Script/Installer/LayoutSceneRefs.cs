@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Game
 {
+    // Bundle scene references commonly used together into one dependency.
     public class LayoutSceneRefs
     {
         public Camera Camera { get; }

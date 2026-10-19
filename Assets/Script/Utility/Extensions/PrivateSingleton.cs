@@ -9,6 +9,7 @@ namespace Utility
   public class PrivateSingleton<T> : MonoBehaviour
     where T : Component
   {
+    // A singleton variant with a private Instance; no current gameplay class inherits it.
     protected static T instance;
     public static bool HasInstance => instance is not null;
 
@@ -36,6 +37,7 @@ namespace Utility
 
     protected virtual void InitializeSingleton()
     {
+      // Register the instance only in Play mode.
       if (!Application.isPlaying)
       {
         return;

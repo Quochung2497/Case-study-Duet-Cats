@@ -2,6 +2,7 @@ using System;
 
 namespace Control
 {
+  // A state has a key and enter, update, and exit phases.
   public interface IState<TState> where TState : Enum
   {
     TState StateKey { get; }
@@ -9,5 +10,6 @@ namespace Control
     void EnterState();
     void UpdateState(float deltaTime);
     void ExitState();
+    bool CanTransition();
   }
 }

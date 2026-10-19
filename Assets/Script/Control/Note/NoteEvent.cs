@@ -8,6 +8,7 @@ namespace Control.Note
         LolipopLong
     }
 
+    // A parsed note is immutable data shared by the timeline, visuals, and scoring.
     public readonly struct NoteEvent
     {
         public int Id { get; }

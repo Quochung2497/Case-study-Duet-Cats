@@ -16,6 +16,7 @@ namespace Control.Cat
 
         public override void UpdateState(float deltaTime)
         {
+            // Choose the next idle clip when one ends instead of looping a single clip.
             if (_complete) PlayNext();
         }
 

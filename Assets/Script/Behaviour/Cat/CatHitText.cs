@@ -10,10 +10,10 @@ namespace Game
         [SerializeField] private Canvas canvas;
         [SerializeField] private TextMeshProUGUI label;
 
-        [Inject] private PlayableSettings _settings;
+        [Inject] private HitTextSettings _settings;
         [Inject] private LayoutSceneRefs _scene;
 
-        private CatBehaviour _cat;
+        private ICatBehaviour _cat;
         private RectTransform _rect;
         private int _lastWord = -1;
         private float _startedAt;
@@ -21,7 +21,8 @@ namespace Game
 
         private void Awake()
         {
-            _cat = GetComponentInParent<CatBehaviour>();
+            // The world-space canvas needs a camera and font; disable label raycasts so drag still works.
+            _cat = GetComponentInParent<ICatBehaviour>();
             if (_cat == null || _settings == null || _scene?.Camera == null ||
                 _settings.HitTextFont == null || canvas == null || label == null)
             {
@@ -54,6 +55,7 @@ namespace Game
             var words = _settings?.HitWords;
             if (_rect == null || words == null || words.Length == 0) return;
 
+            // Choose a random word while avoiding an immediate repeat when possible.
             var index = Random.Range(0, words.Length);
             if (words.Length > 1 && index == _lastWord)
                 index = (index + 1) % words.Length;
@@ -72,6 +74,7 @@ namespace Game
 
         private void UpdateText()
         {
+            // t advances from 0 to 1 in real time; hide the label afterward.
             var t = (Time.unscaledTime - _startedAt) / _settings.HitTextDuration;
             if (t >= 1f)
             {
@@ -80,12 +83,14 @@ namespace Game
                 return;
             }
 
+            // Compensate for the parent's scale so the text is not mirrored or shrunk.
             var scale = _settings.HitTextWorldWidth / _rect.rect.width;
             var parentScale = transform.lossyScale;
             _rect.localScale = new Vector3(
                 scale / Mathf.Abs(parentScale.x),
                 scale / Mathf.Abs(parentScale.y),
                 scale / Mathf.Abs(parentScale.z));
+            // Face the canvas toward the camera, then raise and fade the text.
             _rect.rotation = _scene.Camera.transform.rotation;
             _rect.position = transform.position +
                 Vector3.up * (_settings.HitTextOffsetY + _settings.HitTextRise * t);

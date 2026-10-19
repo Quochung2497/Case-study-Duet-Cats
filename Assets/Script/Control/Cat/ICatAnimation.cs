@@ -3,6 +3,7 @@ using Control.Note;
 
 namespace Control.Cat
 {
+    // States request animations; CatAnimationController chooses the actual Spine clip.
     public interface ICatAnimation
     {
         void PlayIdle(Action onComplete);
