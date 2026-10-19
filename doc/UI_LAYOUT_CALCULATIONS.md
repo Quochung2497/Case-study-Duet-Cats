@@ -1,8 +1,71 @@
-# Responsive UI — Layout Calculations
+# Responsive UI — Built-in Setup and Retained Custom Calculations
 
-This guide explains portrait-baseline group layouts on `build/refactor-and-improvement`: calculate scale/offset from current geometry and apply the result to a parent UI group. Read it with [Runtime System Flows](SYSTEM_FLOWS.md) and [File Reference](FILE_REFERENCE.md).
+Updated: 2026-10-20. Read with [Runtime System Flows](SYSTEM_FLOWS.md) and [File Reference](FILE_REFERENCE.md).
 
-Cross-checked against source commit `33cd662`, the saved scene rules and animation assets. Code excerpts match the current implementation; numeric examples use the actual LayoutMath helper.
+## 0. Latest decision: use Canvas Scaler and anchors
+
+### Chosen behavior
+
+Keep the authored composition of Status and CTA in both orientations. Scale the UI uniformly to fit the reference area, anchor Status top-right and CTA at the center, and keep the original local animation. This does not require custom fitting/clamping of each group or a different landscape composition.
+
+| Element | Built-in configuration / responsibility |
+| --- | --- |
+| Canvas | Scale With Screen Size; reference 1080 x 2280; Screen Match Mode **Expand**. |
+| Status Layout | Fixed authored size; top-right anchors/pivot; authored margin from the parent edge. |
+| CTA Panel | Fixed authored size; centered anchors/pivot; original child composition and clip. |
+| ResponsiveRectTransform | Disable on both groups; restore authored transforms rather than leaving a previous calculated scale. |
+| Aspect Ratio Fitter | Not needed on the complete Status or CTA group. It is optional for a separately resizing image/slot. |
+| GameUIController, GameStateUI, ScoreUI, Animator | Keep state visibility, fades/delays, score and local animation responsibilities. |
+
+### Research before custom implementation
+
+For future layout work, first define the required behavior, then research the relevant Unity APIs/components, Inspector settings and native platform/browser mechanisms against the actual version/target. Try the built-in configuration or a small focused example before adding a custom layout/event system. Record the concrete gap when custom code is justified; reuse valid research and keep the effort proportional to the feature. Apply the same rule in each project scope.
+
+For this case, fixed authored Status/CTA groups can use Canvas Scaler Expand and anchors. Background sprite switching and browser embedding are separate responsibilities to evaluate with their own requirements. The custom history below remains evidence of an implementation, not a reason to repeat it by default.
+
+### Expand, Shrink and the earlier custom path
+
+**Expand** uses the smaller width/height scale ratio. The logical Canvas remains at least as large as the reference on both axes. **Shrink** uses the larger ratio; the logical Canvas can be smaller than the reference on one axis, so an authored fixed composition can extend outside the view. These names describe the Canvas area, not whether the displayed artwork grows or shrinks.
+
+For a simple example, reference 1000 x 2000 and viewport 2000 x 1000 produce:
+
+| Mode | Scale factor | Canvas size in UI units |
+| --- | --- | --- |
+| Expand | 0.5 | 4000 x 2000 |
+| Shrink | 2 | 1000 x 500 |
+
+Expand can leave a smaller centered composition with extra landscape space. It does not move elements into a new horizontal arrangement. Anchors still decide position, and the animation must fit the authored content area. Per-group maximum scale, visibility intersection and full-envelope clamping from the custom implementation are not reproduced automatically; those extra policies are not part of the selected built-in setup.
+
+The earlier custom solution remains useful as a source reference for those policies, but it is more machinery than the current uniform-fit requirement needs. A future concrete layout requirement should establish what built-in configuration cannot provide before that path is restored or extended.
+
+```mermaid
+flowchart TD
+    A["WebGL canvas / viewport size"] --> B["Canvas Scaler: Expand"]
+    B --> C["RectTransform anchors, pivots and authored margins"]
+    C --> D["Status: top-right"]
+    C --> E["CTA: centered composition"]
+    F["Game state, score and animation"] --> G["Views update independently of layout"]
+```
+
+### Background is a separate world-space responsibility
+
+Keep **two sprites**, portrait and landscape. BackgroundBehaviour reads orientation from IViewport, selects the corresponding SceneVisualSettings sprite, centers the SpriteRenderer and uniformly covers the orthographic camera. Canvas Scaler does not resize that renderer. Converting it to a UI Image with Envelope Parent would require render-order setup and would still need sprite/ratio selection; this conversion is not selected. World geometry and viewport events also remain in use for cats and notes.
+
+### Safe area for a phone browser
+
+The browser/embedding page supplies the WebGL canvas rectangle. If it already lies in the safe display region, Unity should not apply a second device inset. This decision adds no SafeAreaRoot, native safe-area calculation or browser bridge. The saved HTML does not request viewport-fit=cover. Fullscreen, browser UI changes and any demonstrated clipping should be checked on the actual hosted build; Simulator does not execute that HTML wrapper. This is a conditional hosting assumption, not a guarantee for all browsers.
+
+### Migration status: source and saved scene are not the same as the target setup
+
+Read-only inspection of Case Study Scene on 2026-10-20 confirms Canvas Scaler Expand at 1080 x 2280, **CTA ResponsiveRectTransform disabled, Status ResponsiveRectTransform still enabled**. Thus the saved scene has not completed the agreed two-group migration. Custom code, components and serialized rules remain in the project. This documentation update does not remove them or edit scene/source/package data. User screenshots provide visual observations during tuning, not a complete runtime/browser validation.
+
+Remaining authoring step: disable the Status component as well, restore/check the authored group transforms, then visually review Status/CTA and their animation in both orientations and the hosted phone browser. A later code cleanup must preserve LayoutMath.Calculate(), ResponsiveLayout and viewport consumers for gameplay/background.
+
+References: [Unity Canvas Scaler](https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-CanvasScaler.html), [CanvasScaler source](https://github.com/Unity-Technologies/uGUI/blob/main/com.unity.ugui/Runtime/UGUI/UI/Core/Layout/CanvasScaler.cs), [Aspect Ratio Fitter](https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-AspectRatioFitter.html), [WebKit safe-area behavior](https://webkit.org/blog/7929/designing-websites-for-iphone-x/).
+
+---
+
+**Retained custom implementation reference — sections 1–8 below.** These sections describe the previous portrait-baseline/rule path, cross-checked at source commit `33cd662`, its then-saved scene and animation assets. Their references to current rules/configuration belong to that custom baseline. They explain retained code; they are not required setup instructions for the built-in decision above.
 
 ## 1. Overview: what the system calculates
 

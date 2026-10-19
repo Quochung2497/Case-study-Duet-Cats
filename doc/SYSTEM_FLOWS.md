@@ -228,9 +228,9 @@ flowchart TD
 
 In the playable scene, Start Tutorial is visible in Start; Scores in Playing and Result; Status Panel in Playing and Result after its initial 2-second delay; EndTutorial in Cta; and CTA Panel in Cta after a 3-second delay. A panel shared by Playing/Result preserves its current visibility or ongoing delay. The brown cat prefab has a second controller for its Start-only bubble. Controllers must remain active while their views are hidden so delayed/fade coroutines can run.
 
-## 8. Responsive gameplay layout and background
+## 8. Responsive gameplay, background and UI layout
 
-ViewportController centrally compares Canvas dimensions plus camera pixel rect, aspect, orthographic size and position, and publishes IViewport.Changed when ready/changed. Nonzero Canvas XY world scale is a readiness check rather than a separately cached change signal. ResponsiveLayout selects the profile from viewport orientation, calculates world bounds/lanes/heights from the orthographic camera and places cats. It emits IResponsiveLayout.Changed when calculated LayoutData or camera pixel rect changes; cats cancel their current drag. Note placement reads the latest LayoutData. BackgroundBehaviour listens to the same viewport event, chooses the orientation sprite and scales it to cover the camera; it has no separate LateUpdate polling loop.
+ViewportController centrally compares Canvas dimensions plus camera pixel rect, aspect, orthographic size and position, and publishes IViewport.Changed when ready/changed. Nonzero Canvas XY world scale is a readiness check rather than a separately cached change signal. ResponsiveLayout selects the profile from viewport orientation, calculates world bounds/lanes/heights from the orthographic camera and places cats. It emits IResponsiveLayout.Changed when calculated LayoutData or camera pixel rect changes; cats cancel their current drag. Note placement reads the latest LayoutData. BackgroundBehaviour listens to the same viewport event, keeps separate portrait and landscape sprites, chooses the orientation sprite and scales its SpriteRenderer uniformly to cover the camera; it has no separate LateUpdate polling loop. This two-image world-space behavior is retained by the 2026-10-20 decision.
 
 ```mermaid
 flowchart TD
@@ -246,11 +246,28 @@ flowchart TD
     I --> J["Scale background to cover camera"]
 ```
 
-Gameplay geometry is responsive within one scene. UI uses the same `IViewport.Changed` event: `ResponsiveRectTransform` caches its rect, parent and root Canvas. `TryGetGeometry()` reads the parent rect and Canvas world corners; `LayoutMath.GetRectInLocalSpace()` converts the corners with the parent's world-to-local matrix. `ApplyLayout()` passes this geometry, portrait data and `UIRectLayoutRules` to `LayoutMath.CalculateUI()`, then applies the result. The helper separates content bounds, visible area, scale, anchor offset and position clamping into named steps. ViewportController filters changes centrally; responsive components do not keep another apply cache or poll per frame. Capture and Inspector preview code compile only in the Editor. The scene keeps these components only on Status Layout and CTA Panel. Children retain their portrait coordinates and animate locally below the group scale. Following the user's visual review, the six retired child components, previous landscape snapshots and unused CTA variant scripts/assets were removed. CTA uses its original portrait clip directly through the existing Animator controller.
+### Built-in UI direction agreed on 2026-10-20
 
-Portrait uses FitParent to retain the authored composition. Landscape CTA uses FitContent within 99% of available Canvas width and 90% of height, with a maximum relative scale of 500/650. Its bounds include the cards' 650-unit animation peaks. Status uses FitParent in both orientations. Position offsets are normalized against the authored parent size; landscape pivots are clamped using full group bounds. A resize within the same orientation also recalculates layout. Viewport startup waits for valid Canvas geometry rather than substituting raw screen pixels.
+Status and CTA keep their authored composition and child animation. Canvas Scaler uses Scale With Screen Size, reference 1080 x 2280 and **Expand**; authored anchors/pivots/margins keep Status top-right and CTA centered. No Aspect Ratio Fitter is needed on either complete fixed-size group. The target setup disables ResponsiveRectTransform on both; UI layout then needs no custom group-math call or viewport subscription. GameUIController, GameStateUI, ScoreUI and Animator retain visibility, score and animation ownership.
 
-See [UI Layout Calculations](UI_LAYOUT_CALCULATIONS.md) for the overall calculation flow, equations, per-enum examples and the visible effects of changing Inspector rules.
+```mermaid
+flowchart TD
+    A["WebGL canvas / viewport changes"] --> B["Canvas Scaler: Expand"]
+    B --> C["Anchors, pivots and authored sizes/margins"]
+    C --> D["Status Layout: top-right"]
+    C --> E["CTA Panel: centered composition"]
+    F["Game state / score"] --> G["Views and local animation"]
+```
+
+**Saved-scene status:** read-only inspection on 2026-10-20 confirms Expand, CTA ResponsiveRectTransform disabled and Status ResponsiveRectTransform still enabled. The saved scene is therefore only partway through this change. Custom scripts/rules remain; this documentation update does not edit or delete them.
+
+Expand provides uniform fit with extra landscape space; it does not reproduce per-group caps/clamps or rearrange elements into a different landscape design. Animation extents and readability need visual review. For mobile WebGL, the embedding page supplies the game rectangle: do not apply another device inset if the browser already contains it safely. No SafeAreaRoot/bridge or background conversion is introduced by this decision.
+
+### Retained custom UI path
+
+When enabled, ResponsiveRectTransform still listens to IViewport.Changed, reads the parent/Canvas geometry, calls LayoutMath.CalculateUI and applies portrait-baseline rules. Its UI helpers implement visible-area intersection, fitting, scale caps, anchor offsets and full-envelope clamping. These remain source/history details rather than requirements for the selected built-in setup. Previous child consumers, snapshots and CTA variants were removed in earlier refactors; the original portrait clip remains.
+
+See [UI Layout Setup and Retained Calculations](UI_LAYOUT_CALCULATIONS.md) for the decision, exact migration status and earlier equations. The world-space flow above remains required for cats, notes and the two background sprites.
 
 ## 9. PlayableSettings configuration
 
