@@ -1,6 +1,6 @@
 # Duet Cats Playable — Technical Overview
 
-This README describes `build/refactor-and-improvement`. The original playable is on the `Main` branch.
+This README describes the refactored implementation. The original submission is preserved at [commit `8a1dfad`](https://github.com/Quochung2497/Case-study-Duet-Cats/tree/8a1dfad562b9c61ab1b47434302765bff30f25f3); `Main` can include later improvements.
 
 ## 1. Overall Project Structure
 
@@ -32,7 +32,7 @@ One Unity WebGL scene supports portrait and landscape, with two cats and four no
 ## 3. Design Patterns and Architecture Decisions
 
 - **Implementation approach:** Research relevant Unity APIs, built-in components/Inspector settings and native platform/browser support before custom code. Prefer configuration or a small integration that meets the scope; record the concrete gap and reason when custom implementation is needed.
-- **Installer/DI:** Installers compose systems and pass dependencies through contracts for input, cats, notes, score, game state, and layout.
+- **Installer/DI:** Installers compose systems and pass dependencies through contracts for input, cats, notes, score, game state, and layout. Duplicate provider return types stop registration with an error naming both providers.
 - **Data-driven/ScriptableObject:** `PlayableSettings` groups system settings and references song/animation assets. `SongCatalog` pairs audio, JSON, and playback options; `CatAnimationSet` maps cues to clip variants, loops, and mix durations. Particle shape/bursts are authored in prefabs.
 - **FSM/Builder:** Game states (`Start`, `Playing`, `Result`, `Cta`) and cat states (`Idle`, `Playing`, `Hit`, `Result`) share the FSM framework and are built in installers. `CanTransition()` exposes action readiness.
 - **Logic/presentation separation:** Drag rules and note timing sit outside MonoBehaviours. `CatAnimationController` handles Spine playback; `GameUIController` owns visibility rules, fades, and delays; `GameStateUI` applies view changes.
@@ -46,6 +46,7 @@ One Unity WebGL scene supports portrait and landscape, with two cats and four no
 
 Personal constraints left 1–2 days for the original playable, prioritizing gameplay and mobile WebGL. The refactors above were added afterwards. Remaining limits:
 
+- **Composition:** Reflection DI, execution order and contracts add setup/debugging cost for a small playable. The existing wiring is retained; a simpler composition root is an option when that cost outweighs its value.
 - **Notes:** All types use instant collision. Long notes could gain hold duration and begin/end handling.
 - **Chart data:** Custom JSON keeps only `id`, `spawnTime`, `lane`, and `visualType`. The original field meanings were unclear and weekend clarification was unavailable; mapping the original schema remains future work.
 - **Runtime song switching:** Selection is captured at scene setup; there is no song-selection UI, and music resources are limited. Future switching would move selection out of the installer and connect a selection UI to playback reconfiguration.
@@ -59,3 +60,7 @@ Personal constraints left 1–2 days for the original playable, prioritizing gam
 - **Commit check:** A local Git hook enforces `type: description` subjects on any branch.
 - **PR check:** PRs into `Main` check conflict markers, `.meta`, GUIDs and JSON, then compile/build with Unity `6000.3.22f1`.
 - **Build & release:** Push `build-v*` tags to build WebGL with Brotli + fallback, publish a ZIP release and deploy GitHub Pages.
+
+## 6. Open a Fresh Clone
+
+Use Unity **6000.3.22f1** with WebGL Build Support. Restore the ignored Spine **4.1** runtime and TMP resources with their `.meta` files before opening `Assets/Scenes/Case Study Scene.unity`. See [Setup and Dependencies](doc/SETUP.md) for the recorded versions, official import paths and reference checks. Private dependency URLs/tokens are not required in the public README.

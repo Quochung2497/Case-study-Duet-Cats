@@ -32,6 +32,7 @@ namespace Utility.DependencyInjection
       BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
 
     private readonly Dictionary<Type, object> _registry = new Dictionary<Type, object>();
+    private readonly Dictionary<Type, string> _providerSources = new Dictionary<Type, string>();
 
     /// <summary>
     /// Called when the script instance is being loaded.
@@ -167,18 +168,25 @@ namespace Utility.DependencyInjection
           continue;
 
         var returnType = method.ReturnType;
+        var providerSource = $"{provider.GetType().FullName}.{method.Name}";
+        if (provider is Component component)
+          providerSource += $" on '{component.gameObject.name}' (instance {component.GetInstanceID()})";
+
+        // Reject a duplicate before invoking it or overwriting the first registration.
+        if (_providerSources.TryGetValue(returnType, out var existingSource))
+          throw new InvalidOperationException(
+            $"Duplicate provider for {returnType.FullName}: {existingSource} and {providerSource}. " +
+            "Register each return type only once.");
+
         var providerInstance = method.Invoke(provider, null);
-        if (providerInstance is not null)
-        {
-          _registry[returnType] = providerInstance;
+        if (providerInstance is null)
+          throw new InvalidOperationException($"Provider {providerSource} returned null for {returnType.FullName}");
+
+        _registry.Add(returnType, providerInstance);
+        _providerSources.Add(returnType, providerSource);
 #if UNITY_EDITOR
-          Debug.Log($"Registered provider {returnType.Name}");
+        Debug.Log($"Registered provider {returnType.Name}");
 #endif
-        }
-        else
-        {
-          throw new Exception($"Provider method {method.Name} returned null");
-        }
       }
     }
 
