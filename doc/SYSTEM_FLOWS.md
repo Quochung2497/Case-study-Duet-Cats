@@ -1,8 +1,8 @@
 # Duet Cats Playable — Runtime System Flows
 
-This document describes the runtime implementation on `build/refactor-and-improvement`, including the playable scene, project scripts, cat/note prefabs and UI animations. It reflects the refactored branch rather than the separate `Main` baseline. See [File Reference](FILE_REFERENCE.md) for responsibilities and dependencies by file.
+This document describes the runtime implementation on `build/refactor-and-improvement`, including the playable scene, project scripts, cat/note prefabs and UI animations. The original submission baseline is commit `8a1dfad562b9c61ab1b47434302765bff30f25f3`; `Main` may contain subsequent refactors. See [File Reference](FILE_REFERENCE.md) for responsibilities and dependencies by file.
 
-Cross-checked against source commit `33cd662` and saved scene/settings/prefabs/animation assets. The overview assumes the normal run with Editor ignoreMisses disabled.
+The runtime baseline was cross-checked at source commit `33cd662` and its saved scene/settings/prefabs/animation assets. The layout status is reconciled with scene commit `eb3491c`, and duplicate-provider validation is documented as of 2026-10-24. The overview assumes the normal run with Editor ignoreMisses disabled.
 
 ## Whole-game flow
 
@@ -40,11 +40,11 @@ flowchart TD
 
 ## 1. Scene setup and dependency injection
 
-`PlayableInstaller` holds the scene references, note prefab, `PlayableSettings`, and scene-specific song choices. Its `Awake()` runs at -1100, validates song selection and required references, and caches the selected definition before Injector runs at -1000. Invalid configuration deactivates its scene roots and requests Editor Play Mode exit; in a player the roots stay inactive. Valid configuration lets the unchanged Injector register `[Provide]` results and fill `[Inject]` fields/methods. `PlayableSettings` holds the shared catalog, cat animation set, input asset and nested settings groups.
+`PlayableInstaller` holds the scene references, note prefab, `PlayableSettings`, and scene-specific song choices. Its `Awake()` runs at -1100, validates song selection and required references, and caches the selected definition before Injector runs at -1000. Invalid configuration deactivates its scene roots and requests Editor Play Mode exit; in a player the roots stay inactive. Valid configuration lets Injector register `[Provide]` results and fill `[Inject]` fields/methods. `PlayableSettings` holds the shared catalog, cat animation set, input asset and nested settings groups.
 
 `InputInstaller` owns input lifecycle. `CatInstaller` builds an action, animation controller and FSM per cat through `ICatSetup`. `NoteInstaller` constructs timeline/pool and passes them to `INoteManager`. `GameInstaller` constructs the game FSM and configures it through `IGameState`. `IInstaller` lifecycle methods are called by each installer's own Awake/Start callbacks. Both game-state and game-host providers return the same GameManager component.
 
-The early root check covers song selection, direct serialized Unity object references on the installer/root settings asset, selected ID resolution and audio/chart presence. JSON contents, prefab physics and Spine clips are checked later by the owning installers. These later failures log and return from system setup; they do not call the root's StopInvalidScene. Injector discovers active MonoBehaviours; it registers all provider results before injecting consumers. It contains property-resolution code, but the current InjectAttribute can be applied only to fields/methods.
+The early root check covers song selection, direct serialized Unity object references on the installer/root settings asset, selected ID resolution and audio/chart presence. JSON contents, prefab physics and Spine clips are checked later by the owning installers. These later failures log and return from system setup; they do not call the root's StopInvalidScene. Injector discovers active MonoBehaviours; it registers all provider results before injecting consumers. Each exact return Type has one registration. A duplicate throws InvalidOperationException before invoking the second provider or injecting consumers; the message names both provider methods, GameObjects and component instance IDs. The first value is not overwritten. Returning the same GameManager under distinct IGameState and IGameHost contracts remains valid. It contains property-resolution code, but the current InjectAttribute can be applied only to fields/methods.
 
 ```mermaid
 flowchart TD
@@ -53,7 +53,8 @@ flowchart TD
     J -->|Yes| L["Cache selected SongDefinition"]
     L --> B["Injector.Awake -1000: find providers"]
     B --> C["Register PlayableInstaller Provide methods"]
-    C --> D["Inject fields on scene components"]
+    C -->|Duplicate return Type| M["Report both providers; abort Injector registration"]
+    C -->|All return Types unique| D["Inject fields on scene components"]
     D --> E["InputInstaller initializes InputReader"]
     D --> F["CatInstaller builds two actions and FSMs"]
     D --> G["NoteInstaller parses chart, builds timeline/pool and initializes manager"]
@@ -248,7 +249,7 @@ flowchart TD
 
 ### Built-in UI direction agreed on 2026-10-20
 
-Status and CTA keep their authored composition and child animation. Canvas Scaler uses Scale With Screen Size, reference 1080 x 2280 and **Expand**; authored anchors/pivots/margins keep Status top-right and CTA centered. No Aspect Ratio Fitter is needed on either complete fixed-size group. The target setup disables ResponsiveRectTransform on both; UI layout then needs no custom group-math call or viewport subscription. GameUIController, GameStateUI, ScoreUI and Animator retain visibility, score and animation ownership.
+Status and CTA keep their authored composition and child animation. Canvas Scaler uses Scale With Screen Size, reference 1080 x 2280 and **Expand**; authored anchors/pivots/margins keep Status top-right and CTA centered. No Aspect Ratio Fitter is needed on either complete fixed-size group. The saved scene disables ResponsiveRectTransform on both; these UI groups need no custom group-math call or viewport subscription. GameUIController, GameStateUI, ScoreUI and Animator retain visibility, score and animation ownership.
 
 ```mermaid
 flowchart TD
@@ -259,7 +260,7 @@ flowchart TD
     F["Game state / score"] --> G["Views and local animation"]
 ```
 
-**Saved-scene status:** read-only inspection on 2026-10-20 confirms Expand, CTA ResponsiveRectTransform disabled and Status ResponsiveRectTransform still enabled. The saved scene is therefore only partway through this change. Custom scripts/rules remain; this documentation update does not edit or delete them.
+**Saved-scene status:** commit eb3491c, rechecked on 2026-10-24, has Expand and ResponsiveRectTransform disabled on both CTA Panel and Status Layout. Custom scripts, disabled components and serialized rules remain intentionally. This follow-up changes documentation only for layout; it does not edit those components or the scene. Visual review on the target browser remains separate from inspecting serialized values.
 
 Expand provides uniform fit with extra landscape space; it does not reproduce per-group caps/clamps or rearrange elements into a different landscape design. Animation extents and readability need visual review. For mobile WebGL, the embedding page supplies the game rectangle: do not apply another device inset if the browser already contains it safely. No SafeAreaRoot/bridge or background conversion is introduced by this decision.
 

@@ -1,6 +1,6 @@
 # Responsive UI — Built-in Setup and Retained Custom Calculations
 
-Updated: 2026-10-20. Read with [Runtime System Flows](SYSTEM_FLOWS.md) and [File Reference](FILE_REFERENCE.md).
+Updated: 2026-10-24. Read with [Runtime System Flows](SYSTEM_FLOWS.md) and [File Reference](FILE_REFERENCE.md).
 
 ## 0. Latest decision: use Canvas Scaler and anchors
 
@@ -13,7 +13,7 @@ Keep the authored composition of Status and CTA in both orientations. Scale the 
 | Canvas | Scale With Screen Size; reference 1080 x 2280; Screen Match Mode **Expand**. |
 | Status Layout | Fixed authored size; top-right anchors/pivot; authored margin from the parent edge. |
 | CTA Panel | Fixed authored size; centered anchors/pivot; original child composition and clip. |
-| ResponsiveRectTransform | Disable on both groups; restore authored transforms rather than leaving a previous calculated scale. |
+| ResponsiveRectTransform | Disabled on both groups in the saved scene; the custom source/components/rules are retained. |
 | Aspect Ratio Fitter | Not needed on the complete Status or CTA group. It is optional for a separately resizing image/slot. |
 | GameUIController, GameStateUI, ScoreUI, Animator | Keep state visibility, fades/delays, score and local animation responsibilities. |
 
@@ -55,11 +55,11 @@ Keep **two sprites**, portrait and landscape. BackgroundBehaviour reads orientat
 
 The browser/embedding page supplies the WebGL canvas rectangle. If it already lies in the safe display region, Unity should not apply a second device inset. This decision adds no SafeAreaRoot, native safe-area calculation or browser bridge. The saved HTML does not request viewport-fit=cover. Fullscreen, browser UI changes and any demonstrated clipping should be checked on the actual hosted build; Simulator does not execute that HTML wrapper. This is a conditional hosting assumption, not a guarantee for all browsers.
 
-### Migration status: source and saved scene are not the same as the target setup
+### Saved scene: built-in UI layout is active
 
-Read-only inspection of Case Study Scene on 2026-10-20 confirms Canvas Scaler Expand at 1080 x 2280, **CTA ResponsiveRectTransform disabled, Status ResponsiveRectTransform still enabled**. Thus the saved scene has not completed the agreed two-group migration. Custom code, components and serialized rules remain in the project. This documentation update does not remove them or edit scene/source/package data. User screenshots provide visual observations during tuning, not a complete runtime/browser validation.
+The saved Case Study Scene at commit eb3491c, rechecked on 2026-10-24, has Canvas Scaler Expand at 1080 x 2280 and **ResponsiveRectTransform disabled on both CTA Panel and Status Layout**. The earlier inspection with Status enabled is superseded by that scene commit. Custom source, disabled components and serialized rules remain intentionally; no custom layout files are removed. This follow-up does not edit scene/package data. User screenshots and serialized values do not replace visual review on the hosted phone browser.
 
-Remaining authoring step: disable the Status component as well, restore/check the authored group transforms, then visually review Status/CTA and their animation in both orientations and the hosted phone browser. A later code cleanup must preserve LayoutMath.Calculate(), ResponsiveLayout and viewport consumers for gameplay/background.
+For visual acceptance, review Status/CTA and animation extents in both orientations and the hosted phone browser. Keep LayoutMath.Calculate(), ResponsiveLayout and viewport consumers for gameplay/background; retaining the inactive custom UI path is intentional, not a pending deletion task.
 
 References: [Unity Canvas Scaler](https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-CanvasScaler.html), [CanvasScaler source](https://github.com/Unity-Technologies/uGUI/blob/main/com.unity.ugui/Runtime/UGUI/UI/Core/Layout/CanvasScaler.cs), [Aspect Ratio Fitter](https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/script-AspectRatioFitter.html), [WebKit safe-area behavior](https://webkit.org/blog/7929/designing-websites-for-iphone-x/).
 
@@ -69,7 +69,7 @@ References: [Unity Canvas Scaler](https://docs.unity3d.com/Packages/com.unity.ug
 
 ## 1. Overview: what the system calculates
 
-UI is first fine-tuned in portrait. When viewport dimensions or orientation change, the system calculates how to place each UI group in the new space. The current scene has two responsive groups: **Status Layout** and **CTA Panel**.
+UI is first fine-tuned in portrait. When viewport dimensions or orientation change, the system calculates how to place each UI group in the new space. The retained custom baseline had two responsive groups: **Status Layout** and **CTA Panel**. In the active setup above, their custom components are disabled.
 
 Think of the parent as a table and the content as an object placed on it:
 
