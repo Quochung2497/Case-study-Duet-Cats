@@ -2,541 +2,541 @@
   "notes": [
     {
       "id": 1,
-      "spawnTime": 0.785713,
+      "spawnTime": 0.085713,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 2,
-      "spawnTime": 0.999999,
+      "spawnTime": 0.299999,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 3,
-      "spawnTime": 1.214284,
+      "spawnTime": 0.514284,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 4,
-      "spawnTime": 2.499997,
+      "spawnTime": 1.799997,
       "lane": 1,
       "visualType": "Strong"
     },
     {
       "id": 5,
-      "spawnTime": 2.499997,
+      "spawnTime": 1.799997,
       "lane": 3,
       "visualType": "Strong"
     },
     {
       "id": 6,
-      "spawnTime": 2.928568,
+      "spawnTime": 2.228568,
       "lane": 1,
       "visualType": "Strong"
     },
     {
       "id": 7,
-      "spawnTime": 2.928568,
+      "spawnTime": 2.228568,
       "lane": 3,
       "visualType": "Strong"
     },
     {
       "id": 8,
-      "spawnTime": 3.357139,
+      "spawnTime": 2.657139,
       "lane": 1,
       "visualType": "Strong"
     },
     {
       "id": 9,
-      "spawnTime": 3.357139,
+      "spawnTime": 2.657139,
       "lane": 3,
       "visualType": "Strong"
     },
     {
       "id": 10,
-      "spawnTime": 3.78571,
+      "spawnTime": 3.085710,
       "lane": 1,
       "visualType": "Strong"
     },
     {
       "id": 11,
-      "spawnTime": 3.78571,
+      "spawnTime": 3.085710,
       "lane": 3,
       "visualType": "Strong"
     },
     {
       "id": 12,
-      "spawnTime": 4.214281,
+      "spawnTime": 3.514281,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 13,
-      "spawnTime": 4.214281,
+      "spawnTime": 3.514281,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 14,
-      "spawnTime": 4.428567,
+      "spawnTime": 3.728567,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 15,
-      "spawnTime": 4.428567,
+      "spawnTime": 3.728567,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 16,
-      "spawnTime": 4.642852,
+      "spawnTime": 3.942852,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 17,
-      "spawnTime": 4.642852,
+      "spawnTime": 3.942852,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 18,
-      "spawnTime": 4.857138,
+      "spawnTime": 4.157138,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 19,
-      "spawnTime": 4.857138,
+      "spawnTime": 4.157138,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 20,
-      "spawnTime": 5.071423,
+      "spawnTime": 4.371423,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 21,
-      "spawnTime": 5.071423,
+      "spawnTime": 4.371423,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 22,
-      "spawnTime": 5.499994,
+      "spawnTime": 4.799994,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 23,
-      "spawnTime": 5.928565,
+      "spawnTime": 5.228565,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 24,
-      "spawnTime": 6.357136,
+      "spawnTime": 5.657136,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 25,
-      "spawnTime": 7.642849,
+      "spawnTime": 6.942849,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 26,
-      "spawnTime": 7.857135,
+      "spawnTime": 7.157135,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 27,
-      "spawnTime": 8.07142,
+      "spawnTime": 7.371420,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 28,
-      "spawnTime": 9.357133,
+      "spawnTime": 8.657133,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 29,
-      "spawnTime": 9.357133,
+      "spawnTime": 8.657133,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 30,
-      "spawnTime": 9.571419,
+      "spawnTime": 8.871419,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 31,
-      "spawnTime": 9.571419,
+      "spawnTime": 8.871419,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 32,
-      "spawnTime": 9.785704,
+      "spawnTime": 9.085704,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 33,
-      "spawnTime": 9.785704,
+      "spawnTime": 9.085704,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 34,
-      "spawnTime": 10.214275,
+      "spawnTime": 9.514275,
       "lane": 2,
       "visualType": "Strong"
     },
     {
       "id": 35,
-      "spawnTime": 10.214275,
+      "spawnTime": 9.514275,
       "lane": 0,
       "visualType": "Strong"
     },
     {
       "id": 36,
-      "spawnTime": 10.642846,
+      "spawnTime": 9.942846,
       "lane": 2,
       "visualType": "Strong"
     },
     {
       "id": 37,
-      "spawnTime": 10.642846,
+      "spawnTime": 9.942846,
       "lane": 0,
       "visualType": "Strong"
     },
     {
       "id": 38,
-      "spawnTime": 11.071417,
+      "spawnTime": 10.371417,
       "lane": 0,
       "visualType": "Strong"
     },
     {
       "id": 39,
-      "spawnTime": 11.071417,
+      "spawnTime": 10.371417,
       "lane": 2,
       "visualType": "Strong"
     },
     {
       "id": 40,
-      "spawnTime": 11.499988,
+      "spawnTime": 10.799988,
       "lane": 0,
       "visualType": "Strong"
     },
     {
       "id": 41,
-      "spawnTime": 11.499988,
+      "spawnTime": 10.799988,
       "lane": 2,
       "visualType": "Strong"
     },
     {
       "id": 42,
-      "spawnTime": 11.928559,
+      "spawnTime": 11.228559,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 43,
-      "spawnTime": 11.928559,
+      "spawnTime": 11.228559,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 44,
-      "spawnTime": 12.142845,
+      "spawnTime": 11.442845,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 45,
-      "spawnTime": 12.142845,
+      "spawnTime": 11.442845,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 46,
-      "spawnTime": 12.35713,
+      "spawnTime": 11.657130,
       "lane": 3,
       "visualType": "LolipopLong"
     },
     {
       "id": 47,
-      "spawnTime": 12.35713,
+      "spawnTime": 11.657130,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 48,
-      "spawnTime": 12.785701,
+      "spawnTime": 12.085701,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 49,
-      "spawnTime": 12.785701,
+      "spawnTime": 12.085701,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 50,
-      "spawnTime": 13.214272,
+      "spawnTime": 12.514272,
       "lane": 3,
       "visualType": "Strong"
     },
     {
       "id": 51,
-      "spawnTime": 13.642843,
+      "spawnTime": 12.942843,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 52,
-      "spawnTime": 14.071414,
+      "spawnTime": 13.371414,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 53,
-      "spawnTime": 14.2857,
+      "spawnTime": 13.585700,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 54,
-      "spawnTime": 14.499985,
+      "spawnTime": 13.799985,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 55,
-      "spawnTime": 14.928556,
+      "spawnTime": 14.228556,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 56,
-      "spawnTime": 15.357127,
+      "spawnTime": 14.657127,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 57,
-      "spawnTime": 15.571413,
+      "spawnTime": 14.871413,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 58,
-      "spawnTime": 15.785698,
+      "spawnTime": 15.085698,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 59,
-      "spawnTime": 16.214269,
+      "spawnTime": 15.514269,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 60,
-      "spawnTime": 16.64284,
+      "spawnTime": 15.942840,
       "lane": 1,
       "visualType": "Strong"
     },
     {
       "id": 61,
-      "spawnTime": 17.071411,
+      "spawnTime": 16.371411,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 62,
-      "spawnTime": 17.499982,
+      "spawnTime": 16.799982,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 63,
-      "spawnTime": 17.714268,
+      "spawnTime": 17.014268,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 64,
-      "spawnTime": 17.928553,
+      "spawnTime": 17.228553,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 65,
-      "spawnTime": 18.357124,
+      "spawnTime": 17.657124,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 66,
-      "spawnTime": 18.57141,
+      "spawnTime": 17.871410,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 67,
-      "spawnTime": 18.785695,
+      "spawnTime": 18.085695,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 68,
-      "spawnTime": 18.999981,
+      "spawnTime": 18.299981,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 69,
-      "spawnTime": 19.214266,
+      "spawnTime": 18.514266,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 70,
-      "spawnTime": 19.428552,
+      "spawnTime": 18.728552,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 71,
-      "spawnTime": 19.642837,
+      "spawnTime": 18.942837,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 72,
-      "spawnTime": 20.071408,
+      "spawnTime": 19.371408,
       "lane": 3,
       "visualType": "Strong"
     },
     {
       "id": 73,
-      "spawnTime": 20.499979,
+      "spawnTime": 19.799979,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 74,
-      "spawnTime": 20.92855,
+      "spawnTime": 20.228550,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 75,
-      "spawnTime": 21.142836,
+      "spawnTime": 20.442836,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 76,
-      "spawnTime": 21.357121,
+      "spawnTime": 20.657121,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 77,
-      "spawnTime": 21.785692,
+      "spawnTime": 21.085692,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 78,
-      "spawnTime": 22.214263,
+      "spawnTime": 21.514263,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 79,
-      "spawnTime": 22.428549,
+      "spawnTime": 21.728549,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 80,
-      "spawnTime": 22.642834,
+      "spawnTime": 21.942834,
       "lane": 3,
       "visualType": "Normal"
     },
     {
       "id": 81,
-      "spawnTime": 23.071405,
+      "spawnTime": 22.371405,
       "lane": 2,
       "visualType": "Normal"
     },
     {
       "id": 82,
-      "spawnTime": 23.499976,
+      "spawnTime": 22.799976,
       "lane": 1,
       "visualType": "Strong"
     },
     {
       "id": 83,
-      "spawnTime": 23.928547,
+      "spawnTime": 23.228547,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 84,
-      "spawnTime": 24.357118,
+      "spawnTime": 23.657118,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 85,
-      "spawnTime": 24.571404,
+      "spawnTime": 23.871404,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 86,
-      "spawnTime": 24.785689,
+      "spawnTime": 24.085689,
       "lane": 0,
       "visualType": "Normal"
     },
     {
       "id": 87,
-      "spawnTime": 25.642831,
+      "spawnTime": 24.942831,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 88,
-      "spawnTime": 25.857117,
+      "spawnTime": 25.157117,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 89,
-      "spawnTime": 26.071402,
+      "spawnTime": 25.371402,
       "lane": 1,
       "visualType": "Normal"
     },
     {
       "id": 90,
-      "spawnTime": 26.499973,
+      "spawnTime": 25.799973,
       "lane": 1,
       "visualType": "Normal"
     }
