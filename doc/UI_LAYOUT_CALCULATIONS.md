@@ -1,6 +1,6 @@
 # Responsive UI — Built-in Setup and Retained Custom Calculations
 
-Updated: 2026-10-24. Read with [Runtime System Flows](SYSTEM_FLOWS.md) and [File Reference](FILE_REFERENCE.md).
+Updated: 2026-10-24. Read with [Runtime System Flows](SYSTEM_FLOWS.md).
 
 ## 0. Latest decision: use Canvas Scaler and anchors
 

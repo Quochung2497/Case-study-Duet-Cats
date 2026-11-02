@@ -1,6 +1,6 @@
 # Duet Cats Playable — Runtime System Flows
 
-This document describes the runtime implementation on `build/refactor-and-improvement`, including the playable scene, project scripts, cat/note prefabs and UI animations. The original submission baseline is commit `8a1dfad562b9c61ab1b47434302765bff30f25f3`; `Main` may contain subsequent refactors. See [File Reference](FILE_REFERENCE.md) for responsibilities and dependencies by file.
+This document describes the runtime implementation on `build/refactor-and-improvement`, including the playable scene, project scripts, cat/note prefabs and UI animations. The original submission baseline is commit `8a1dfad562b9c61ab1b47434302765bff30f25f3`; `Main` may contain subsequent refactors.
 
 The runtime baseline was cross-checked at source commit `33cd662` and its saved scene/settings/prefabs/animation assets. The layout status is reconciled with scene commit `eb3491c`, and duplicate-provider validation is documented as of 2026-10-24. The overview assumes the normal run with Editor ignoreMisses disabled.
 
