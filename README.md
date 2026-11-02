@@ -1,7 +1,5 @@
 # Duet Cats Playable — Technical Overview
 
-This README describes the refactored implementation. The original submission is preserved at [commit `8a1dfad`](https://github.com/Quochung2497/Case-study-Duet-Cats/tree/8a1dfad562b9c61ab1b47434302765bff30f25f3); `Main` can include later improvements.
-
 ## 1. Overall Project Structure
 
 One Unity WebGL scene supports portrait and landscape, with two cats and four note lanes.
